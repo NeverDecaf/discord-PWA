@@ -9,4 +9,4 @@ A failed attempt to wrap the discord web client in a Progressive Web Application
 
 ### This tells us 2 things:
 1. Discord could very quickly and easily turn their web application into a PWA.
-2. For anyone on a separate domain to do it would involve circumventing security measures in some way.
+2. For anyone on a separate domain to do so would involve circumventing security measures in some way.
