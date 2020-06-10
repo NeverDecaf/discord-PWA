@@ -1,0 +1,6 @@
+div[class *= baseLayer] > div[class |= container] > nav[class *= guilds] + div[class *= base] {
+    border - radius: 8 px 0 0 8 px
+}
+nav[class ^= wrapper] div[class *= scroller]: not([class *= scrollerWrap]) {
+    padding - top: 4 px
+}

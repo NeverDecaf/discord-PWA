@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Discord PWA Test</title>
+  <title>Discord PWA</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
@@ -16,9 +16,8 @@
   <meta name="msapplication-TileColor" content="#202225">
 </head>
 <body class="fullscreen">
-  <div class="container">
-    <h1 class="title">Install as PWA to use</h1>
-  </div>
+  <div class="container" id="main" style="display:none;"></div>
   <script src="js/main.js"></script>
+  <iframe id="frame" src="https://discord.com/channels/@me" title="Discord Frame" width="100%" height="100%" frameborder="0" allow="microphone; camera"></iframe>
 </body>
 </html>

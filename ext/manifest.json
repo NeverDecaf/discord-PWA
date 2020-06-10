@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "Discord X-Frame/CSP Bypass",
+  "version": "1.0",
+
+  "description": "Deletes X-Frame-Options and Content-Security-Policy response headers for discord.com. Also injects a bit of Javascript to communicate with the accompanying PWA.",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+"externally_connectable": {
+"ids": [ "*" ],
+"matches": ["https://discord.com/*"]
+},
+  "content_scripts": [
+  {
+    "matches": ["https://discord.com/*"],
+    "js": ["postMessage.js"],
+    "css": ["client.css"],
+    "all_frames": true,
+    "run_at": "document_end"
+   }
+  ],
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "https://discord.com/*"
+  ],
+
+  "update_url": "https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml"
+}
