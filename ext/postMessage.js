@@ -112,7 +112,7 @@ function main() {
                 mentions: unreadMentions,
                 channels: unreadChannels
             };
-
+			// console.log(data);
             parent.postMessage(data.VARIABLE_UNREAD_COUNT, '*');
             window.postMessage(data, '*');
         }

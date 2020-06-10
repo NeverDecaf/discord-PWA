@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Discord X-Frame/CSP Bypass",
-    "version": "1.1",
+    "version": "1.1.1",
 
     "description": "Deletes X-Frame-Options and Content-Security-Policy response headers for discord.com. Also injects a bit of Javascript to communicate with the accompanying PWA.",
     "icons": {
