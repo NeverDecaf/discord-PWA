@@ -24,4 +24,5 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 - It is possible to open multiple windows at once, which causes undefined notification behaviour.
 #### Notes
 - Badges will not work unless you enable the `#enable-experimental-web-platform-features` flag in `chrome://flags` though it should be standard soon™. Badges display the number of unread mentions, so you may not see any.
-- Modified from [https://github.com/jamesjohnson280/hello-pwa](https://github.com/jamesjohnson280/hello-pwa).
+- Taskbar behaviour is customizable in the [extension's options](chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html).
+- Code modified from [https://github.com/jamesjohnson280/hello-pwa](https://github.com/jamesjohnson280/hello-pwa), [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp) code was also used/referenced.

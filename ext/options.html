@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>Discord PWA Options</title>
+	<link rel="stylesheet" href="options.css" /> </head>
+
+<body>
+	<div id="app">
+		<h2>Taskbar Options</h2>
+		<div>
+			<label> <span>Use Badge to display # of unread</span>
+				<select name="Badge Display" id="badge_count">
+					<option value="mentions">mentions</option>
+					<option value="channels">channels</option>
+					<option value="messages">messages</option>
+				</select>
+			</label>
+			<label> <span>Highlight taskbar icon when you have new</span>
+				<select name="Highlight on New" id="draw_attention_on">
+					<option value="mentions">mentions</option>
+					<option value="channels">channels</option>
+					<option value="messages">messages</option>
+				</select>
+			</label>
+		</div>
+		<h3>Changes may not apply until you restart the App.</h3> </div>
+	<script src="options.js"></script>
+</body>
+
+</html>

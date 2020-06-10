@@ -73,26 +73,6 @@ function main() {
         };
     })();
 
-
-
-    checkForGuilds = function () {
-        let timesChecked = 0;
-        return new Promise(resolve => {
-            const checkForGuilds = function () {
-                const wrapper = BDV2.guildClasses.wrapper.split(" ")[0];
-                if (document.querySelectorAll(`.${wrapper}`).length > 0) timesChecked++;
-                const guild = BDV2.guildClasses.listItem.split(" ")[0];
-                const blob = BDV2.guildClasses.blobContainer.split(" ")[0];
-                if (document.querySelectorAll(`.${wrapper} .${guild} .${blob}`).length > 0) return resolve(bdConfig.deferLoaded = true);
-                else if (timesChecked >= 50) return resolve(bdConfig.deferLoaded = true);
-                setTimeout(checkForGuilds, 100);
-            };
-            if (document.readyState != "loading") setTimeout(checkForGuilds, 100);
-            document.addEventListener("DOMContentLoaded", () => {
-                setTimeout(checkForGuilds, 100);
-            });
-        });
-    };
     let timesChecked = 0;
 
     function waitForLoad() {
@@ -109,38 +89,59 @@ function main() {
         const Dispatcher = wm.findByUniqueProperties(["Dispatcher"]).default;
 
         function addUnread() {
-            var totalUnread = 0;
-            // commented below is the correct way to get a count of all unread messages, we are using a shortcut now as this value is not needed atm
-            // // for every unread guild, iterate over every channel and sum unread messages
-            // for (let g in UnreadGuildUtils.getUnreadGuilds()) {
-            // let channels = GuildChannelStore.getChannels(g).SELECTABLE;
-            // channels.forEach((e) => totalUnread += UnreadChannelUtils.getUnreadCount(e.channel.id));
-            // }
-            // // now get all unread DM channel ids and do the same.
-            // DirectMessageUnreadStore.getUnreadPrivateChannelIds().forEach((id) => totalUnread += UnreadChannelUtils.getUnreadCount(id));
-            // // get total unread mention count.
-            totalUnread = Object.keys(UnreadGuildUtils.getUnreadGuilds()).length || Object.keys(DirectMessageUnreadStore.getUnreadPrivateChannelIds()).length;
+            var unreadMessages = 0;
+            var unreadChannels = 0;
+            // for every unread guild, iterate over every channel and sum unread messages
+            for (let g in UnreadGuildUtils.getUnreadGuilds()) {
+                let channels = GuildChannelStore.getChannels(g).SELECTABLE;
+                channels.forEach((e) => {
+                    let unread = UnreadChannelUtils.getUnreadCount(e.channel.id);
+                    unreadMessages += unread;
+                    unreadChannels += ~~(unread > 0);
+                });
+            }
+            // now get all unread DM channel ids and do the same.
+            DirectMessageUnreadStore.getUnreadPrivateChannelIds().forEach((id) => {
+                unreadMessages += UnreadChannelUtils.getUnreadCount(id);
+                unreadChannels += 1;
+            });
+            // hasAnyMessage = Object.keys(UnreadGuildUtils.getUnreadGuilds()).length || Object.keys(DirectMessageUnreadStore.getUnreadPrivateChannelIds()).length;
             var unreadMentions = UnreadGuildUtils.getTotalMentionCount();
-            parent.postMessage(unreadMentions, '*');
-            window.postMessage(totalUnread, '*');
+            data = {
+                messages: unreadMessages,
+                mentions: unreadMentions,
+                channels: unreadChannels
+            };
+
+            parent.postMessage(data.VARIABLE_UNREAD_COUNT, '*');
+            window.postMessage(data, '*');
         }
         Dispatcher.subscribe('RPC_NOTIFICATION_CREATE', () => addUnread());
         Dispatcher.subscribe('MESSAGE_ACK', () => addUnread());
-        // Dispatcher.subscribe('WINDOW_FOCUS',()=>addUnread());
+        Dispatcher.subscribe('WINDOW_FOCUS', () => addUnread());
         // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // Dispatcher.subscribe('TRACK',()=>addUnread());
     }
     waitForLoad();
 }
 
-var script = document.createElement('script');
-script.appendChild(document.createTextNode('(' + main + ')();'));
-(document.body || document.head || document.documentElement).appendChild(script);
+var default_options = {
+    "badge_count": "mentions",
+    "draw_attention_on": "messages"
+};
 
-window.addEventListener("message", function (event) {
-    if (event.origin == "https://discord.com")
-        chrome.runtime.sendMessage({
-            content: "drawAttention",
-            unread: event.data
-        });
+chrome.storage.sync.get(default_options, function (settings) {
+
+    var script = document.createElement('script');
+
+    script.appendChild(document.createTextNode(('(' + main + ')();').replace('VARIABLE_UNREAD_COUNT', settings.badge_count)));
+    (document.body || document.head || document.documentElement).appendChild(script);
+
+    window.addEventListener("message", function (event) {
+        if (event.origin == "https://discord.com")
+            chrome.runtime.sendMessage({
+                content: "drawAttention",
+                unread: event.data[settings.draw_attention_on]
+            });
+    });
 });
