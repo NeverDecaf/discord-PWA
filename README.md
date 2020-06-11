@@ -6,7 +6,7 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 - Shows taskbar notifications on mentions/messages (currently will highlight on new message and display badge with mention count)
 #### Differences from [discord-chrome-app](https://github.com/NeverDecaf/discord-chrome-app)
 - Shows number of unread mentions in a badge in your taskbar.
-- Title bar cannot be themed to match the native discord client's. If Chromium allows borderless PWAs in the future this will be possible.
+- Title bar cannot be themed to match the native discord client's. If Chromium allows borderless PWAs in the future this will be possible (by supporting "display":"fullscreen").
 - Chromium's url tooltips will display in the bottom left when hovering over links/images.
 - Your extensions can access/modify the Discord iframe.
 #### To install the accompanying extension
