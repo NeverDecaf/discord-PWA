@@ -4,3 +4,8 @@ div[class *= baseLayer] > div[class |= container] > nav[class *= guilds] + div[c
 nav[class ^= wrapper] div[class *= scroller]:not([class *= scrollerWrap]) {
     padding-top: 4px
 }
+/* hide "Download Apps" item */
+div[class|=scroller] > div[class|=listItem]:nth-last-child(2),
+div[class|=scroller] > div[class|=listItem]:last-child {
+	display:none
+}

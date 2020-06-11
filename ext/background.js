@@ -16,6 +16,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 chrome.runtime.onMessage.addListener(
     function (request, sender, sendResponse) {
+		// console.log('drawattention request: '+request)
         if (request.content == "drawAttention") {
             currentAttentionState = request.unread > 0;
             chrome.windows.update(sender.tab.windowId, {

@@ -18,10 +18,15 @@ window.addEventListener('DOMContentLoaded', (event) => {
 <a href ='./Discord-PWA-Bypass.crx'><h2 class="subtitle">You will also need the Chrome Extension</h2></a>
 You may also need to <a href="https://web.dev/badging-api/#alternatives-to-the-origin-trial">enable this experimental flag</a> <br/>if you don't see badges like this: <img src="./badge_example.png"/>`
         document.getElementById("frame").setAttribute("style", "display:none;");
+    } else {
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = '.fullscreen {background: #202225;}'; //#36393F;
+        document.getElementsByTagName('head')[0].appendChild(style);
     }
 });
 
-window.onappinstalled = () => { 
-  document.getElementById("main").setAttribute("style", "display:none;");
-  document.getElementById("frame").setAttribute("style", "");
+window.onappinstalled = () => {
+    document.getElementById("main").setAttribute("style", "display:none;");
+    document.getElementById("frame").setAttribute("style", "");
 };

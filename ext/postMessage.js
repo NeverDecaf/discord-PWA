@@ -113,6 +113,7 @@ function main() {
                 channels: unreadChannels,
                 never: 0
             };
+            // console.log(data)
             parent.postMessage(data.VARIABLE_UNREAD_COUNT, '*');
             window.postMessage(data, '*');
         }
