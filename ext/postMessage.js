@@ -110,9 +110,9 @@ function main() {
             data = {
                 messages: unreadMessages,
                 mentions: unreadMentions,
-                channels: unreadChannels
+                channels: unreadChannels,
+                never: 0
             };
-			// console.log(data);
             parent.postMessage(data.VARIABLE_UNREAD_COUNT, '*');
             window.postMessage(data, '*');
         }
@@ -130,6 +130,10 @@ var default_options = {
     "draw_attention_on": "messages"
 };
 
+// setInterval(()=>chrome.runtime.sendMessage({
+// content: "interval"
+// }),500);
+
 chrome.storage.sync.get(default_options, function (settings) {
 
     var script = document.createElement('script');
@@ -143,5 +147,8 @@ chrome.storage.sync.get(default_options, function (settings) {
                 content: "drawAttention",
                 unread: event.data[settings.draw_attention_on]
             });
+        setTimeout(() => chrome.runtime.sendMessage({
+            content: "interval"
+        }), 200);
     });
 });
