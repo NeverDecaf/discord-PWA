@@ -4,7 +4,8 @@ var filesToCache = [
     './index.html',
     './css/style.css',
     './js/main.js',
-	'./images/'
+    './PWA_Install_Button.png',
+    './badge_example.png'
 ];
 
 /* Start the service worker and cache all of the app's content */
