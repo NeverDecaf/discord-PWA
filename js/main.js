@@ -4,7 +4,10 @@ const discordHome = "https://discord.com/channels/@me";
 window.addEventListener('DOMContentLoaded', (event) => {
     window.addEventListener('message', function (e) {
         if (e.origin == 'https://discord.com') {
-            navigator.setAppBadge(e.data);
+            if (e.data.name == 'badge')
+                navigator.setAppBadge(e.data.value);
+            else if (e.data.name == 'refresh')
+                setTimeout(() => window.location.reload(), 1000);
         }
     });
     if ('serviceWorker' in navigator) {

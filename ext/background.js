@@ -14,17 +14,20 @@ chrome.webRequest.onHeadersReceived.addListener(
     },
     ['blocking', 'responseHeaders']);
 
-chrome.runtime.onMessage.addListener(
-    function (request, sender, sendResponse) {
-		// console.log('drawattention request: '+request)
-        if (request.content == "drawAttention") {
-            currentAttentionState = request.unread > 0;
-            chrome.windows.update(sender.tab.windowId, {
-                drawAttention: currentAttentionState
-            });
-        } else if (request.content == "interval")
-            chrome.windows.update(sender.tab.windowId, {
-                drawAttention: currentAttentionState
-            });
-    }
-);
+chrome.runtime.onConnect.addListener(function (port) {
+    var wid = port.sender.tab.windowId;
+    port.onMessage.addListener(
+        function (request, senderPort) {
+            // console.log('drawattention request: ' + request)
+            if (request.content == "drawAttention") {
+                currentAttentionState = request.unread > 0;
+                chrome.windows.update(wid, {
+                    drawAttention: currentAttentionState
+                });
+            } else if (request.content == "interval")
+                chrome.windows.update(wid, {
+                    drawAttention: currentAttentionState
+                });
+        }
+    );
+});

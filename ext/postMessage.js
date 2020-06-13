@@ -1,5 +1,6 @@
 function main() {
-    wm = (() => {
+    //WebpackModules from BetterDiscord source
+    WebpackModules = (() => {
         const req = webpackJsonp.push([
             [], {
                 __extra_id__: (module, exports, req) => module.exports = req
@@ -76,17 +77,17 @@ function main() {
     let timesChecked = 0;
 
     function waitForLoad() {
-        if (timesChecked < 100 && (typeof webpackJsonp === 'undefined' || wm.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]) === null)) {
+        if (timesChecked < 100 && (typeof webpackJsonp === 'undefined' || WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]) === null)) {
             timesChecked++;
             setTimeout(waitForLoad, 100);
             return;
         }
         // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
-        const UnreadGuildUtils = wm.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
-        const GuildChannelStore = wm.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
-        const UnreadChannelUtils = wm.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
-        const DirectMessageUnreadStore = wm.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
-        const Dispatcher = wm.findByUniqueProperties(["Dispatcher"]).default;
+        const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
+        const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
+        const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
+        const DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
+        const Dispatcher = WebpackModules.findByUniqueProperties(["Dispatcher"]).default;
 
         function addUnread() {
             var unreadMessages = 0;
@@ -114,7 +115,10 @@ function main() {
                 never: 0
             };
             // console.log(data)
-            parent.postMessage(data.VARIABLE_UNREAD_COUNT, '*');
+            parent.postMessage({
+                name: 'badge',
+                value: data.VARIABLE_UNREAD_COUNT
+            }, '*');
             window.postMessage(data, '*');
         }
         Dispatcher.subscribe('RPC_NOTIFICATION_CREATE', () => addUnread());
@@ -135,21 +139,29 @@ var default_options = {
 // content: "interval"
 // }),500);
 
+var port = chrome.runtime.connect({
+    name: "discord-pwa"
+});
+
 chrome.storage.sync.get(default_options, function (settings) {
-
     var script = document.createElement('script');
-
     script.appendChild(document.createTextNode(('(' + main + ')();').replace('VARIABLE_UNREAD_COUNT', settings.badge_count)));
     (document.body || document.head || document.documentElement).appendChild(script);
-
-    window.addEventListener("message", function (event) {
+    var relayMsg = function (event) {
         if (event.origin == "https://discord.com")
-            chrome.runtime.sendMessage({
+            port.postMessage({
                 content: "drawAttention",
                 unread: event.data[settings.draw_attention_on]
             });
-        setTimeout(() => chrome.runtime.sendMessage({
+        setTimeout(() => port.postMessage({
             content: "interval"
         }), 200);
+    };
+    window.addEventListener("message", relayMsg);
+    port.onDisconnect.addListener(() => {
+        window.removeEventListener("message", relayMsg);
+        parent.postMessage({
+            name: 'refresh'
+        }, '*');
     });
 });
