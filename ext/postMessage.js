@@ -129,7 +129,7 @@ function main() {
                 channels: unreadChannels,
                 never: 0
             };
-            console.log(data)
+            // console.log(data)
             parent.postMessage({
                 name: 'badge',
                 value: data.VARIABLE_UNREAD_COUNT

@@ -18,7 +18,7 @@ chrome.runtime.onConnect.addListener(function (port) {
     var currentAttentionState = false;
     port.onMessage.addListener(
         function (request, senderPort) {
-            console.log('drawattention request: ' + request.unread + ' current: ' + currentAttentionState + ' window: ' + wid + ' content: ' + request.content)
+            // console.log('drawattention request: ' + request.unread + ' current: ' + currentAttentionState + ' window: ' + wid + ' content: ' + request.content)
             if (request.content == "drawAttention") {
                 currentAttentionState = request.unread > 0;
                 chrome.windows.update(wid, {
