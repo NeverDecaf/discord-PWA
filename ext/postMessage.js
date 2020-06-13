@@ -1,4 +1,11 @@
 function main() {
+    function updateModal() {
+        setTimeout(updateModal, 1000);
+    }
+    window.addEventListener('message', function (ev) {
+        if (ev.data.name == 'updateAvailable')
+            updateModal();
+    });
     //WebpackModules from BetterDiscord source
     WebpackModules = (() => {
         const req = webpackJsonp.push([
@@ -74,20 +81,28 @@ function main() {
         };
     })();
 
-    let timesChecked = 0;
-
-    function waitForLoad() {
-        if (timesChecked < 100 && (typeof webpackJsonp === 'undefined' || WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]) === null)) {
-            timesChecked++;
-            setTimeout(waitForLoad, 100);
-            return;
+    function waitForLoad(maxtimems, callback) {
+        var interval = 100; // ms
+        if (maxtimems > 0 && (typeof webpackJsonp === 'undefined' || WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]) === null)) {
+            setTimeout(() => waitForLoad(maxtimems - interval, callback), interval);
+        } else {
+            callback();
         }
+    }
+
+    waitForLoad(10000, () => {
         // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
         const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
         const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
         const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
         const DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
         const Dispatcher = WebpackModules.findByUniqueProperties(["Dispatcher"]).default;
+
+        const modalTitle = "Discord PWA Extension Update Available";
+        const ModalStack = WebpackModules.findByUniqueProperties(["push", "update", "pop", "popWithKey"])
+        const TextElement = WebpackModules.findByUniqueProperties(["Sizes", "Colors"])
+        const ConfirmationModal = WebpackModules.find(m => m.defaultProps && m.key && m.key() == "confirm-modal");
+        const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"])
 
         function addUnread() {
             var unreadMessages = 0;
@@ -114,20 +129,44 @@ function main() {
                 channels: unreadChannels,
                 never: 0
             };
-            // console.log(data)
+            console.log(data)
             parent.postMessage({
                 name: 'badge',
                 value: data.VARIABLE_UNREAD_COUNT
             }, '*');
-            window.postMessage(data, '*');
+            window.postMessage({
+                type: 'unreadCount',
+                payload: data
+            }, '*');
         }
         Dispatcher.subscribe('RPC_NOTIFICATION_CREATE', () => addUnread());
         Dispatcher.subscribe('MESSAGE_ACK', () => addUnread());
-        Dispatcher.subscribe('WINDOW_FOCUS', () => addUnread());
+        Dispatcher.subscribe('WINDOW_FOCUS', (e) => {
+            if (!e.focused) window.postMessage({
+                type: 'focusLost'
+            }, '*')
+        });
         // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // Dispatcher.subscribe('TRACK',()=>addUnread());
-    }
-    waitForLoad();
+        updateModal = function () {
+            if (!ModalStack || !ConfirmationModal || !TextElement) return alert('An update for the Discord PWA Extension is available. Please update your extension ASAP.');
+            ModalStack.push(function (props) {
+                return React.createElement(ConfirmationModal, Object.assign({
+                    header: modalTitle,
+                    children: [React.createElement(TextElement, {
+                        color: TextElement.Colors.PRIMARY,
+                        children: ['Functionality is not guaranteed on anything but the lastest version']
+                    })],
+                    red: false,
+                    confirmText: "Download Now",
+                    // cancelText: "Cancel",
+                    onConfirm: () => {
+                        window.open('https://github.com/NeverDecaf/discord-PWA/raw/master/Discord-PWA-Bypass.crx', '_blank');
+                    }
+                }, props));
+            });
+        }
+    });
 }
 
 var default_options = {
@@ -135,9 +174,13 @@ var default_options = {
     "draw_attention_on": "messages"
 };
 
-// setInterval(()=>chrome.runtime.sendMessage({
-// content: "interval"
-// }),500);
+function updateAfter(delay = 50) {
+    // we can't do this in the background script as timers can be paused sometimes.
+    // the reason for this in the first place is the inconsistent nature of drawAttention()
+    setTimeout(() => port.postMessage({
+        content: "update"
+    }), delay);
+}
 
 var port = chrome.runtime.connect({
     name: "discord-pwa"
@@ -148,14 +191,23 @@ chrome.storage.sync.get(default_options, function (settings) {
     script.appendChild(document.createTextNode(('(' + main + ')();').replace('VARIABLE_UNREAD_COUNT', settings.badge_count)));
     (document.body || document.head || document.documentElement).appendChild(script);
     var relayMsg = function (event) {
-        if (event.origin == "https://discord.com")
-            port.postMessage({
-                content: "drawAttention",
-                unread: event.data[settings.draw_attention_on]
-            });
-        setTimeout(() => port.postMessage({
-            content: "interval"
-        }), 200);
+        if (event.origin == "https://discord.com") {
+
+            if (event.data.type == 'unreadCount') {
+                port.postMessage({
+                    content: "drawAttention",
+                    unread: event.data.payload[settings.draw_attention_on]
+                });
+                updateAfter();
+            } else if (event.data.type == 'focusLost') {
+                updateAfter();
+                updateAfter(100);
+            }
+        } else if (event.data.name == 'updateAvailable') {
+            window.postMessage({
+                type: 'updateAvailable'
+            }, '*');
+        }
     };
     window.addEventListener("message", relayMsg);
     port.onDisconnect.addListener(() => {
@@ -164,4 +216,13 @@ chrome.storage.sync.get(default_options, function (settings) {
             name: 'refresh'
         }, '*');
     });
+    port.onMessage.addListener(
+        function (request, senderPort) {
+            if (request.name == 'version')
+                parent.postMessage({
+                    name: 'extversion',
+                    value: request.data
+                }, '*');
+        }
+    );
 });
