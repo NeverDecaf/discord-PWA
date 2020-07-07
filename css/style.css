@@ -25,8 +25,8 @@ html,
   background: #202225;
   display: none;
 }
-/* Display iframe only in standalone mode */
-@media all and (display-mode: standalone) {
+/* Display iframe only when opened as PWA */
+@media all and (display-mode: standalone),(display-mode: fullscreen) {
   #main {
     display: none;
   }
