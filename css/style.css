@@ -1,7 +1,6 @@
 body {
   font-family: sans-serif;
 }
-
 /* Make content area fill the entire browser window */
 html,
 .fullscreen {
@@ -11,19 +10,30 @@ html,
   padding: 0;
   width: 100%;
 }
-
 /* Center the content in the browser window */
 .container {
   margin: auto;
   text-align: center;
 }
-
 .title {
   font-size: 3rem;
 }
 .subtitle {
   font-size: 1.5rem;
 }
-.frame {
+#frame {
   background: #202225;
+  display: none;
+}
+/* Display iframe only in standalone mode */
+@media all and (display-mode: standalone) {
+  #main {
+    display: none;
+  }
+  #frame {
+    display: block;
+  }
+  .fullscreen {
+    background: #202225;
+  }
 }

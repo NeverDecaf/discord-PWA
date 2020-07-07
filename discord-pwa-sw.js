@@ -3,6 +3,7 @@ var filesToCache = [
     './',
     './index.html',
     './css/style.css',
+	'./css/client.css',
     './js/main.js',
     './PWA_Install_Button.png',
     './badge_example.png'
@@ -17,20 +18,18 @@ self.addEventListener('install', function (e) {
     );
 });
 
-function update(request) {
-    caches.open(cacheName).then(function (cache) {
-        fetch(request).then(function (response) {
-            cache.put(request, response.clone())
-        });
-    });
-}
-
-/* Serve cached content, fallback to network, update cache from network regardless. */
-self.addEventListener('fetch', function (e) {
-    e.respondWith(
-        caches.match(e.request).then(function (response) {
-            return response || fetch(e.request);
-        })
-    );
-    e.waitUntil(update(e.request));
+/* Use cached file and update cache if possible */
+self.addEventListener('fetch', event => {
+	event.respondWith(
+		caches.open(cacheName).then(cache => {
+			return cache.match(event.request).then(response => {
+				const fetchPromise = fetch(event.request)
+				.then(networkResponse => {
+					cache.put(event.request, networkResponse.clone());
+					return networkResponse;
+				}).catch(err => undefined)
+				return response || fetchPromise;
+			})
+		})
+	);
 });

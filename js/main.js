@@ -1,4 +1,3 @@
-const isInStandaloneMode = () => (window.matchMedia('(display-mode: standalone)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
 const discordHome = "https://discord.com/channels/@me";
 
 function version_is_newer(current, available) {
@@ -28,29 +27,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             name: 'updateAvailable'
                         }, e.origin);
                     }
+                }).catch(err => {
+                    console.log('Error checking for extension updates.');
                 })
+            else if (e.data.name == 'clientcss') {
+                fetch('./css/client.css').then(resp => resp.text().then(txt => {
+                    e.source.postMessage({
+                        name: 'clientcss',
+                        css: txt
+                    }, e.origin);
+                }));
+            }
         }
     });
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./discord-pwa-sw.js');
     }
-    if (!isInStandaloneMode()) {
-        document.getElementById("main").setAttribute("style", "");
-        document.getElementById("main").innerHTML = `
-<h1 class="title">Install as PWA to use</h1>
-<img src='./PWA_Install_Button.png'/>
-<a href ='./Discord-PWA-Bypass.crx'><h2 class="subtitle">You will also need the Chrome Extension</h2></a>
-You may also need to <a href="https://web.dev/badging-api/#alternatives-to-the-origin-trial">enable this experimental flag</a> <br/>if you don't see badges like this: <img src="./badge_example.png"/>`
-        document.getElementById("frame").setAttribute("style", "display:none;");
-    } else {
-        var style = document.createElement('style');
-        style.type = 'text/css';
-        style.innerHTML = '.fullscreen {background: #202225;}'; //#36393F;
-        document.getElementsByTagName('head')[0].appendChild(style);
-    }
 });
-
-window.onappinstalled = () => {
-    document.getElementById("main").setAttribute("style", "display:none;");
-    document.getElementById("frame").setAttribute("style", "");
-};

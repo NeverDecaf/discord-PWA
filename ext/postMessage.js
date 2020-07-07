@@ -105,6 +105,7 @@ function main() {
         const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"])
 
         function addUnread() {
+            console.log('adding up unread');
             var unreadMessages = 0;
             var unreadChannels = 0;
             // for every unread guild, iterate over every channel and sum unread messages
@@ -140,11 +141,14 @@ function main() {
             }, '*');
         }
         Dispatcher.subscribe('RPC_NOTIFICATION_CREATE', () => addUnread());
+        /* Because drawAttention: false does not work, there is currently no need to listen for MESSAGE_ACK */
         Dispatcher.subscribe('MESSAGE_ACK', () => addUnread());
         Dispatcher.subscribe('WINDOW_FOCUS', (e) => {
-            if (!e.focused) window.postMessage({
-                type: 'focusLost'
-            }, '*')
+            if (!e.focused)
+                setTimeout(() => {
+                    console.log('fl');
+                    addUnread();
+                }, 250);
         });
         // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // Dispatcher.subscribe('TRACK',()=>addUnread());
@@ -200,13 +204,20 @@ chrome.storage.sync.get(default_options, function (settings) {
                 });
                 updateAfter();
             } else if (event.data.type == 'focusLost') {
-                updateAfter();
-                updateAfter(100);
+                updateAfter(1500);
+                updateAfter(1600);
             }
-        } else if (event.data.name == 'updateAvailable') {
-            window.postMessage({
-                type: 'updateAvailable'
-            }, '*');
+        } else {
+            if (event.data.name == 'updateAvailable') {
+                window.postMessage({
+                    type: 'updateAvailable'
+                }, '*');
+            } else if (event.data.name == 'clientcss') {
+                port.postMessage({
+                    content: 'clientcss',
+                    css: event.data.css
+                }, '*');
+            }
         }
     };
     window.addEventListener("message", relayMsg);
@@ -221,6 +232,11 @@ chrome.storage.sync.get(default_options, function (settings) {
             if (request.name == 'version')
                 parent.postMessage({
                     name: 'extversion',
+                    value: request.data
+                }, '*');
+            else if (request.name == 'clientcss')
+                parent.postMessage({
+                    name: 'clientcss',
                     value: request.data
                 }, '*');
         }

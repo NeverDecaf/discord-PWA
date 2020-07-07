@@ -3,7 +3,7 @@ const HEADERS_TO_STRIP_LOWERCASE = [
     'x-frame-options',
 ];
 
-
+var cacheName = 'discord-pwa';
 chrome.webRequest.onHeadersReceived.addListener(
     details => ({
         responseHeaders: details.responseHeaders.filter(header =>
@@ -15,6 +15,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 chrome.runtime.onConnect.addListener(function (port) {
     var wid = port.sender.tab.windowId;
+    var tid = port.sender.tab.id;
     var currentAttentionState = false;
     port.onMessage.addListener(
         function (request, senderPort) {
@@ -28,10 +29,23 @@ chrome.runtime.onConnect.addListener(function (port) {
                 chrome.windows.update(wid, {
                     drawAttention: currentAttentionState
                 });
+            else if (request.content == "clientcss")
+                chrome.webNavigation.getAllFrames({
+                    tabId: tid
+                }, (e) => {
+                    chrome.tabs.insertCSS(tid, {
+                        code: request.css,
+                        frameId: e.filter(el => el.parentFrameId==0)[0].frameId
+                    });
+                });
         }
     );
     port.postMessage({
         name: 'version',
         data: chrome.runtime.getManifest().version
+    });
+    port.postMessage({
+        name: 'clientcss',
+        data: 1
     });
 });

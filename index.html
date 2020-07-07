@@ -1,23 +1,27 @@
 <!doctype html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8">
-  <title>Discord PWA</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="images/152.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#202225"/>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="Discord PWA Test">
-  <meta name="msapplication-TileImage" content="images/144.png">
-  <meta name="msapplication-TileColor" content="#202225">
-</head>
+	<meta charset="utf-8">
+	<title>DISCORD</title>
+	<link rel="manifest" href="manifest.json">
+	<link rel="stylesheet" href="css/style.css">
+	<link rel="icon" href="favicon.ico" type="image/x-icon" />
+	<link rel="apple-touch-icon" href="images/152.png">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#202225" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-title" content="Discord">
+	<meta name="msapplication-TileImage" content="images/144.png">
+	<meta name="msapplication-TileColor" content="#202225"> </head>
+
 <body class="fullscreen">
-  <div class="container" id="main" style="display:none;"></div>
-  <script src="js/main.js"></script>
-  <iframe id="frame" src="https://discord.com/channels/@me" title="Discord Frame" width="100%" height="100%" frameborder="0" allow="microphone; camera"></iframe>
+	<div class="container" id="main">
+		<h1 class="title">Install as PWA to use</h1> <img src='./PWA_Install_Button.png' /> <a href='./Discord-PWA-Bypass.crx'><h2 class="subtitle">You will also need the Chrome Extension</h2></a> You may also need to <a href="https://web.dev/badging-api/#alternatives-to-the-origin-trial">enable this experimental flag</a>
+		<br/>if you don't see badges like this: <img src="./badge_example.png" /></div>
+	<script src="js/main.js"></script>
+	<iframe id="frame" src="https://discord.com/channels/@me" title="Discord Frame" width="100%" height="100%" frameborder="0" allow="microphone; camera"></iframe>
 </body>
+
 </html>
