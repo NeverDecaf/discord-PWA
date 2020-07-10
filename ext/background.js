@@ -19,33 +19,33 @@ chrome.runtime.onConnect.addListener(function (port) {
     var currentAttentionState = false;
     port.onMessage.addListener(
         function (request, senderPort) {
-            // console.log('drawattention request: ' + request.unread + ' current: ' + currentAttentionState + ' window: ' + wid + ' content: ' + request.content)
-            if (request.content == "drawAttention") {
-                currentAttentionState = request.unread > 0;
+            switch (request.type) {
+            case 'drawAttention':
+                currentAttentionState = request.payload > 0;
                 chrome.windows.update(wid, {
                     drawAttention: currentAttentionState
                 });
-            } else if (request.content == "update")
-                chrome.windows.update(wid, {
-                    drawAttention: currentAttentionState
-                });
-            else if (request.content == "clientcss")
+                break;
+            case 'clientcss':
                 chrome.webNavigation.getAllFrames({
                     tabId: tid
                 }, (e) => {
                     chrome.tabs.insertCSS(tid, {
-                        code: request.css,
-                        frameId: e.filter(el => el.parentFrameId==0)[0].frameId
+                        code: request.payload,
+                        frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
                     });
                 });
+                break;
+            }
         }
     );
     port.postMessage({
-        name: 'version',
-        data: chrome.runtime.getManifest().version
+        dest: 'PWA',
+        type: 'extversion',
+        payload: chrome.runtime.getManifest().version
     });
     port.postMessage({
-        name: 'clientcss',
-        data: 1
+        dest: 'PWA',
+        type: 'clientcss'
     });
 });

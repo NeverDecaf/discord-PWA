@@ -3,8 +3,15 @@ function main() {
         setTimeout(updateModal, 1000);
     }
     window.addEventListener('message', function (ev) {
-        if (ev.data.name == 'updateAvailable')
-            updateModal();
+        switch (ev.data.dest) {
+        case 'iframe':
+            switch (ev.data.type) {
+            case 'updateAvailable':
+                updateModal();
+                break;
+            }
+            break;
+        }
     });
     //WebpackModules from BetterDiscord source
     WebpackModules = (() => {
@@ -105,7 +112,6 @@ function main() {
         const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"])
 
         function addUnread() {
-            console.log('adding up unread');
             var unreadMessages = 0;
             var unreadChannels = 0;
             // for every unread guild, iterate over every channel and sum unread messages
@@ -130,24 +136,26 @@ function main() {
                 channels: unreadChannels,
                 never: 0
             };
-            // console.log(data)
-            parent.postMessage({
-                name: 'badge',
-                value: data.VARIABLE_UNREAD_COUNT
+            window.postMessage({
+                dest: 'PWA',
+                type: 'badge',
+                payload: data.DYNAMIC_VARIABLE_BADGE_COUNT
             }, '*');
             window.postMessage({
-                type: 'unreadCount',
-                payload: data
+                dest: 'background',
+                type: 'drawAttention',
+                payload: data.DYNAMIC_VARIABLE_DRAWATTENTION_COUNT
             }, '*');
         }
         Dispatcher.subscribe('RPC_NOTIFICATION_CREATE', () => addUnread());
-        /* Because drawAttention: false does not work, there is currently no need to listen for MESSAGE_ACK */
         Dispatcher.subscribe('MESSAGE_ACK', () => addUnread());
         Dispatcher.subscribe('WINDOW_FOCUS', (e) => {
             if (!e.focused)
                 setTimeout(() => {
-                    console.log('fl');
                     addUnread();
+                    setTimeout(() => {
+                        addUnread();
+                    }, 50);
                 }, 250);
         });
         // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
@@ -159,7 +167,7 @@ function main() {
                     header: modalTitle,
                     children: [React.createElement(TextElement, {
                         color: TextElement.Colors.PRIMARY,
-                        children: ['Functionality is not guaranteed on anything but the lastest version']
+                        children: ['Functionality is not guaranteed on anything except the latest version']
                     })],
                     red: false,
                     confirmText: "Download Now",
@@ -178,67 +186,42 @@ var default_options = {
     "draw_attention_on": "messages"
 };
 
-function updateAfter(delay = 50) {
-    // we can't do this in the background script as timers can be paused sometimes.
-    // the reason for this in the first place is the inconsistent nature of drawAttention()
-    setTimeout(() => port.postMessage({
-        content: "update"
-    }), delay);
-}
-
 var port = chrome.runtime.connect({
     name: "discord-pwa"
 });
 
 chrome.storage.sync.get(default_options, function (settings) {
     var script = document.createElement('script');
-    script.appendChild(document.createTextNode(('(' + main + ')();').replace('VARIABLE_UNREAD_COUNT', settings.badge_count)));
+    script.appendChild(document.createTextNode(('(' + main + ')();').replace('DYNAMIC_VARIABLE_BADGE_COUNT', settings.badge_count).replace('DYNAMIC_VARIABLE_DRAWATTENTION_COUNT', settings.draw_attention_on)));
     (document.body || document.head || document.documentElement).appendChild(script);
     var relayMsg = function (event) {
-        if (event.origin == "https://discord.com") {
-
-            if (event.data.type == 'unreadCount') {
-                port.postMessage({
-                    content: "drawAttention",
-                    unread: event.data.payload[settings.draw_attention_on]
-                });
-                updateAfter();
-            } else if (event.data.type == 'focusLost') {
-                updateAfter(1500);
-                updateAfter(1600);
-            }
-        } else {
-            if (event.data.name == 'updateAvailable') {
-                window.postMessage({
-                    type: 'updateAvailable'
-                }, '*');
-            } else if (event.data.name == 'clientcss') {
-                port.postMessage({
-                    content: 'clientcss',
-                    css: event.data.css
-                }, '*');
-            }
+        switch (event.data.dest) {
+        case 'content':
+            // handle anything with dest: "content" here.
+            break;
+        case 'background':
+            port.postMessage(event.data, '*');
+            break;
+        case 'PWA':
+            parent.postMessage(event.data, '*');
+            break;
         }
     };
     window.addEventListener("message", relayMsg);
     port.onDisconnect.addListener(() => {
         window.removeEventListener("message", relayMsg);
         parent.postMessage({
-            name: 'refresh'
+            dest: 'PWA',
+            type: 'refresh'
         }, '*');
     });
     port.onMessage.addListener(
         function (request, senderPort) {
-            if (request.name == 'version')
-                parent.postMessage({
-                    name: 'extversion',
-                    value: request.data
-                }, '*');
-            else if (request.name == 'clientcss')
-                parent.postMessage({
-                    name: 'clientcss',
-                    value: request.data
-                }, '*');
+            switch (request.dest) {
+            case 'PWA':
+                parent.postMessage(request, '*');
+                break;
+            }
         }
     );
 });

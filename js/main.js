@@ -12,32 +12,41 @@ function version_is_newer(current, available) {
 
 window.addEventListener('DOMContentLoaded', (event) => {
     window.addEventListener('message', function (e) {
-        if (e.origin == 'https://discord.com') {
-            if (e.data.name == 'badge')
-                navigator.setAppBadge(e.data.value);
-            else if (e.data.name == 'refresh')
+        switch (e.data.dest) {
+        case 'PWA':
+            switch (e.data.type) {
+            case 'badge':
+                navigator.setAppBadge(e.data.payload);
+                break;
+            case 'refresh':
                 setTimeout(() => window.location.reload(), 1000);
-            else if (e.data.name == 'extversion')
+                break;
+            case 'extversion':
                 fetch('https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml')
-                .then(response => response.text())
-                .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
-                .then(data => {
-                    if (version_is_newer(e.data.value, data.getElementsByTagName("updatecheck")[0].getAttribute('version'))) {
-                        e.source.postMessage({
-                            name: 'updateAvailable'
-                        }, e.origin);
-                    }
-                }).catch(err => {
-                    console.log('Error checking for extension updates.');
-                })
-            else if (e.data.name == 'clientcss') {
+                    .then(response => response.text())
+                    .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
+                    .then(data => {
+                        if (version_is_newer(e.data.payload, data.getElementsByTagName("updatecheck")[0].getAttribute('version'))) {
+                            e.source.postMessage({
+                                dest: 'iframe',
+                                type: 'updateAvailable'
+                            }, e.origin);
+                        }
+                    }).catch(err => {
+                        console.log('Error checking for extension updates.');
+                    })
+                break;
+            case 'clientcss':
                 fetch('./css/client.css').then(resp => resp.text().then(txt => {
                     e.source.postMessage({
-                        name: 'clientcss',
-                        css: txt
+                        dest: 'background',
+                        type: 'clientcss',
+                        payload: txt
                     }, e.origin);
                 }));
+                break;
             }
+            break;
         }
     });
     if ('serviceWorker' in navigator) {
