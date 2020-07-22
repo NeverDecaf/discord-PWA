@@ -11,6 +11,10 @@ function version_is_newer(current, available) {
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
+    var extNotInstalled = setTimeout(() => {
+        document.getElementById('extWarning').setAttribute("style", "display:block");
+        document.getElementById('frame').setAttribute("style", "display:none");
+    }, 5000);
     window.addEventListener('message', function (e) {
         switch (e.data.dest) {
         case 'PWA':
@@ -22,6 +26,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 setTimeout(() => window.location.reload(), 1000);
                 break;
             case 'extversion':
+                clearTimeout(extNotInstalled);
                 fetch('https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml')
                     .then(response => response.text())
                     .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))

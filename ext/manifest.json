@@ -1,14 +1,15 @@
 {
     "manifest_version": 2,
-    "name": "Discord X-Frame/CSP Bypass",
-    "version": "1.2.1",
+    "name": "Discord PWA Helper",
+    "version": "1.2.2",
 
-    "description": "Deletes X-Frame-Options and Content-Security-Policy response headers for discord.com. Also injects a bit of Javascript to communicate with the accompanying PWA.",
+    "description": "Deletes X-Frame-Options response header for discord.com. Also injects some Javascript to enable notifications.",
     "icons": {
         "16": "icon16.png",
         "48": "icon48.png",
         "128": "icon128.png"
     },
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtNMPPNxhMu90LdWNgUhFtRwurW593/N9HIZn4hKfpDi7/NEbOzAFH6cwI/ob+U4tgYO3c/o8aI9wmelZAGqQvAVkURWKCg5ygTLqNEP7qP+D32u7zY+bNmO8KYFP3EfzQAZzfWK3Ou7qPHBqXql6lhtffYdsv60kw/U61IrUzRkjrpRoB5Hb4RkTX/IAwkSz6nyNSzf/ox07Tef/Q+74ZbyMJL23BmcMrmuBg6DNpsYqGd8UCkhfeywS6KkXE6gKrPh73jY2coLFsSJuchUf9qSvoNvSSTge9DtZq7TKLsKZB1M+3DKV5mZ+F9o3ygYdd0LwhHO94/U5eiXP9eRibwIDAQAB",
 
     "background": {
         "scripts": ["background.js"]

@@ -25,6 +25,10 @@ html,
   background: #202225;
   display: none;
 }
+#extWarning {
+  display: none;
+  background: white;
+}
 /* Display iframe only when opened as PWA */
 @media all and (display-mode: standalone),(display-mode: fullscreen) {
   #main {
