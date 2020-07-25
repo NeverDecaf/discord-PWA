@@ -14,7 +14,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
     var extNotInstalled = setTimeout(() => {
         document.getElementById('extWarning').setAttribute("style", "display:block");
         document.getElementById('frame').setAttribute("style", "display:none");
-    }, 5000);
+    }, 10000);
     window.addEventListener('message', function (e) {
         switch (e.data.dest) {
         case 'PWA':
