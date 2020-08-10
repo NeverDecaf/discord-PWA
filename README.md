@@ -3,7 +3,7 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 ## [Click here to Install](https://neverdecaf.github.io/discord-PWA/)
 #### Differences from the web client
 - Opens in a separate window that can be pinned and used independently from your browser.
-- Shows taskbar notifications on mentions/messages (currently will highlight on new message and display badge with mention count)
+- Shows taskbar notifications on mentions/messages (highlight on new message and display badge with mention count -- can be customized in extension options)
 #### Differences from [discord-chrome-app](https://github.com/NeverDecaf/discord-chrome-app)
 - Shows number of unread mentions in a badge in your taskbar.
 - Title bar cannot be themed to match the native discord client's. If Chromium allows borderless PWAs in the future this will be possible (by supporting "display":"fullscreen").
@@ -20,9 +20,12 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 1. Download the .crx and extract its contents to a folder
 2. Visit chrome://extensions/ and turn on developer mode (toggle in top right)
 3. Click `Load unpacked` and select the directory you extracted the crx to.
+#### If discord iframe does not load (despite having the extension installed)
+- Remove and re-install the extension. This happens when multiple extensions try to modify headers for a page; the last installed extension has priority while others are blocked access.
 #### Bugs
 - Unread count only includes messages after the PWA has started, meaning the icon will not flash/highlight upon startup.
 - It is possible to open multiple windows at once, which causes undefined notification behaviour.
+- The "extension is required" warning may appear even if discord successfully loads, simply refresh the PWA with F5 or ctrl+r to fix this.
 #### Notes
 - Badges will not work unless you enable the `#enable-experimental-web-platform-features` flag in `chrome://flags` though it should be standard soon™. Badges display the number of unread mentions, so you may not see any.
 - Taskbar behaviour is customizable in the [extension's options](chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html) `chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html`.
