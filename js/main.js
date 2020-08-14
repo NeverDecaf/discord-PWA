@@ -1,4 +1,6 @@
 const discordHome = "https://discord.com/channels/@me";
+const modal = document.getElementById("extWarning");
+var modalCloseButton = document.getElementById("modalClose");
 
 function version_is_newer(current, available) {
     let current_subvs = current.split(".");
@@ -12,9 +14,8 @@ function version_is_newer(current, available) {
 
 window.addEventListener('DOMContentLoaded', (event) => {
     var extNotInstalled = setTimeout(() => {
-        document.getElementById('extWarning').setAttribute("style", "display:block");
-        document.getElementById('frame').setAttribute("style", "display:none");
-    }, 10000);
+        modal.style.display = 'block';
+    }, 6000);
     window.addEventListener('message', function (e) {
         switch (e.data.dest) {
         case 'PWA':
@@ -58,3 +59,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
         navigator.serviceWorker.register('./discord-pwa-sw.js');
     }
 });
+
+window.onclick = function (event) {
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+modalCloseButton.onclick = function() {
+  modal.style.display = "none";
+}
