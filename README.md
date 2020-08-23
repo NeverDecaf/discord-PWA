@@ -25,8 +25,7 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 #### Bugs
 - Unread count only includes messages after the PWA has started, meaning the icon will not flash/highlight upon startup.
 - It is possible to open multiple windows at once, which causes undefined notification behaviour.
-- The "extension is required" warning may appear even if discord successfully loads, simply refresh the PWA with F5 or ctrl+r to fix this.
+- The "extension is required" warning may appear even if discord successfully loads, you can safely close the modal if this happens.
 #### Notes
-- Badges will not work unless you enable the `#enable-experimental-web-platform-features` flag in `chrome://flags` though it should be standard soon™. Badges display the number of unread mentions, so you may not see any.
 - Taskbar behaviour is customizable in the [extension's options](chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html) `chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html`.
 - Code modified from [https://github.com/jamesjohnson280/hello-pwa](https://github.com/jamesjohnson280/hello-pwa), [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp) code was also used/referenced.
