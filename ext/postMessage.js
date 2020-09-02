@@ -224,4 +224,8 @@ chrome.storage.sync.get(default_options, function (settings) {
             }
         }
     );
+    port.postMessage({
+        dest: 'background',
+        type: 'init'
+    });
 });

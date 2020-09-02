@@ -35,16 +35,18 @@ chrome.runtime.onConnect.addListener(function (port) {
                     });
                 });
                 break;
+            case 'init':
+                port.postMessage({
+                    dest: 'PWA',
+                    type: 'extversion',
+                    payload: chrome.runtime.getManifest().version
+                });
+                port.postMessage({
+                    dest: 'PWA',
+                    type: 'clientcss'
+                });
+                break;
             }
         }
     );
-    port.postMessage({
-        dest: 'PWA',
-        type: 'extversion',
-        payload: chrome.runtime.getManifest().version
-    });
-    port.postMessage({
-        dest: 'PWA',
-        type: 'clientcss'
-    });
 });
