@@ -105,12 +105,6 @@ function main() {
         const DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
         const Dispatcher = WebpackModules.findByUniqueProperties(["Dispatcher"]).default;
 
-        const modalTitle = "Discord PWA Extension Update Available";
-        const ModalStack = WebpackModules.findByUniqueProperties(["push", "update", "pop", "popWithKey"])
-        const TextElement = WebpackModules.findByUniqueProperties(["Sizes", "Colors"])
-        const ConfirmationModal = WebpackModules.find(m => m.defaultProps && m.key && m.key() == "confirm-modal");
-        const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"])
-
         function addUnread() {
             var unreadMessages = 0;
             var unreadChannels = 0;
@@ -160,25 +154,44 @@ function main() {
         });
         // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // Dispatcher.subscribe('TRACK',()=>addUnread());
-        updateModal = function () {
-            if (!ModalStack || !ConfirmationModal || !TextElement) return alert('An update for the Discord PWA Extension is available. Please update your extension ASAP.');
-            ModalStack.push(function (props) {
-                return React.createElement(ConfirmationModal, Object.assign({
-                    header: modalTitle,
-                    children: [React.createElement(TextElement, {
-                        color: TextElement.Colors.PRIMARY,
-                        children: ['Functionality is not guaranteed on anything except the latest version']
-                    })],
-                    red: false,
-                    confirmText: "Download Now",
-                    // cancelText: "Cancel",
-                    onConfirm: () => {
-                        window.open('https://github.com/NeverDecaf/discord-PWA/raw/master/Discord-PWA-Bypass.crx', '_blank');
-                    }
-                }, props));
-            });
-        }
-    });
+		showConfirmationModal = function (title, content, options = {}) {
+			const ModalActions = WebpackModules.findByUniqueProperties(["openModal", "updateModal"]);
+			const Markdown = WebpackModules.findByDisplayName("Markdown");
+			const ConfirmationModal = WebpackModules.findByDisplayName("ConfirmModal");
+			const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"]);
+			if (!ModalActions || !ConfirmationModal || !Markdown) return alert(content);
+
+			const emptyFunction = () => {};
+			const {
+				onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = "Okay", cancelText = "Cancel", danger = false, key = undefined
+			} = options;
+
+			if (!Array.isArray(content)) content = [content];
+			content = content.map(c => typeof (c) === "string" ? React.createElement(Markdown, null, c) : c);
+			return ModalActions.openModal(props => {
+				return React.createElement(ConfirmationModal, Object.assign({
+					header: title,
+					red: danger,
+					confirmText: confirmText,
+					cancelText: cancelText,
+					onConfirm: onConfirm,
+					onCancel: onCancel
+				}, props), content);
+			}, {
+				modalKey: key
+			});
+		}
+
+		updateModal = function () {
+		return showConfirmationModal('Update Available', 'An update for the Discord PWA extension is available.', {
+			confirmText: "Download now",
+			cancelText: "Remind me later",
+			onConfirm: () => {
+				window.open('https://github.com/NeverDecaf/discord-PWA/raw/master/Discord-PWA-Bypass.crx', '_blank');
+			}
+		});
+		}
+	});
 }
 
 var default_options = {
