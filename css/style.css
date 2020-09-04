@@ -28,18 +28,6 @@ html,
 #main {
   z-index: 2;
 }
-/* Display iframe only when opened as PWA */
-@media all and (display-mode: standalone),(display-mode: fullscreen) {
-  #main {
-    display: none;
-  }
-  #frame {
-    display: block;
-  }
-  .fullscreen {
-    background: #202225;
-  }
-}
 .modal {
   display: none; /* Hidden by default */
   position: fixed;
@@ -70,4 +58,20 @@ html,
   color: black;
   text-decoration: none;
   cursor: pointer;
+}
+
+/* Display iframe only when opened as PWA */
+@media all and (display-mode: standalone),(display-mode: fullscreen) {
+  #main {
+    display: none;
+  }
+  #frame {
+    display: block;
+  }
+  .fullscreen {
+    background: #202225;
+  }
+  .modal.show {
+	display: block;
+  }
 }

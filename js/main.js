@@ -14,7 +14,7 @@ function version_is_newer(current, available) {
 
 window.addEventListener('DOMContentLoaded', (event) => {
     var extNotInstalled = setTimeout(() => {
-        modal.style.display = 'block';
+        modal.classList.add('show');
     }, 6000);
     window.addEventListener('message', function (e) {
         switch (e.data.dest) {
@@ -62,9 +62,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 window.onclick = function (event) {
     if (event.target == modal) {
-        modal.style.display = 'none';
+		modal.classList.remove('show');
     }
 }
 modalCloseButton.onclick = function() {
-  modal.style.display = "none";
+  modal.classList.remove('show');
 }
