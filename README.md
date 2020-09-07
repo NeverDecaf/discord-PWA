@@ -10,6 +10,7 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 - Chromium's url tooltips will display in the bottom left when hovering over links/images.
 - Your extensions can access/modify the Discord iframe.
 #### To install the accompanying extension
+###### Note: You cannot use extensions from outside of the Chrome Web Store on Google Chrome by design. Unless someone decides to upload this to the Chrome Web Store, consider this extension incompatible with Google Chrome. Chromium and its derivatives or Chrome Canary, etc. should all work, though you may need to use the workaround below.
 1. Download [the crx file](https://neverdecaf.github.io/discord-PWA/Discord-PWA-Bypass.crx).
 2. Navigate to `chrome://extensions/`
 3. Enable `Developer mode` (toggle/checkbox in top right corner, may vary depending on version)
