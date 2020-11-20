@@ -98,6 +98,11 @@ function main() {
     }
 
     waitForLoad(10000, () => {
+        window.postMessage({
+            dest: 'PWA',
+            type: 'discordLoaded'
+        }, '*');
+
         // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
         const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
         const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
@@ -154,44 +159,44 @@ function main() {
         });
         // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // Dispatcher.subscribe('TRACK',()=>addUnread());
-		showConfirmationModal = function (title, content, options = {}) {
-			const ModalActions = WebpackModules.findByUniqueProperties(["openModal", "updateModal"]);
-			const Markdown = WebpackModules.findByDisplayName("Markdown");
-			const ConfirmationModal = WebpackModules.findByDisplayName("ConfirmModal");
-			const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"]);
-			if (!ModalActions || !ConfirmationModal || !Markdown) return alert(content);
+        showConfirmationModal = function (title, content, options = {}) {
+            const ModalActions = WebpackModules.findByUniqueProperties(["openModal", "updateModal"]);
+            const Markdown = WebpackModules.findByDisplayName("Markdown");
+            const ConfirmationModal = WebpackModules.findByDisplayName("ConfirmModal");
+            const React = WebpackModules.findByUniqueProperties(["Component", "PureComponent", "Children", "createElement", "cloneElement"]);
+            if (!ModalActions || !ConfirmationModal || !Markdown) return alert(content);
 
-			const emptyFunction = () => {};
-			const {
-				onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = "Okay", cancelText = "Cancel", danger = false, key = undefined
-			} = options;
+            const emptyFunction = () => {};
+            const {
+                onConfirm = emptyFunction, onCancel = emptyFunction, confirmText = "Okay", cancelText = "Cancel", danger = false, key = undefined
+            } = options;
 
-			if (!Array.isArray(content)) content = [content];
-			content = content.map(c => typeof (c) === "string" ? React.createElement(Markdown, null, c) : c);
-			return ModalActions.openModal(props => {
-				return React.createElement(ConfirmationModal, Object.assign({
-					header: title,
-					red: danger,
-					confirmText: confirmText,
-					cancelText: cancelText,
-					onConfirm: onConfirm,
-					onCancel: onCancel
-				}, props), content);
-			}, {
-				modalKey: key
-			});
-		}
+            if (!Array.isArray(content)) content = [content];
+            content = content.map(c => typeof (c) === "string" ? React.createElement(Markdown, null, c) : c);
+            return ModalActions.openModal(props => {
+                return React.createElement(ConfirmationModal, Object.assign({
+                    header: title,
+                    red: danger,
+                    confirmText: confirmText,
+                    cancelText: cancelText,
+                    onConfirm: onConfirm,
+                    onCancel: onCancel
+                }, props), content);
+            }, {
+                modalKey: key
+            });
+        }
 
-		updateModal = function () {
-		return showConfirmationModal('Update Available', 'An update for the Discord PWA extension is available.', {
-			confirmText: "Download now",
-			cancelText: "Remind me later",
-			onConfirm: () => {
-				window.open('https://github.com/NeverDecaf/discord-PWA/raw/master/Discord-PWA-Bypass.crx', '_blank');
-			}
-		});
-		}
-	});
+        updateModal = function () {
+            return showConfirmationModal('Update Available', 'An update for the Discord PWA extension is available.', {
+                confirmText: "Download now",
+                cancelText: "Remind me later",
+                onConfirm: () => {
+                    window.open('https://github.com/NeverDecaf/discord-PWA/raw/master/Discord-PWA-Bypass.crx', '_blank');
+                }
+            });
+        }
+    });
 }
 
 var default_options = {
@@ -202,7 +207,10 @@ var default_options = {
 var port = chrome.runtime.connect({
     name: "discord-pwa"
 });
-
+parent.postMessage({
+            dest: 'PWA',
+            type: 'init'
+        }, '*');
 chrome.storage.sync.get(default_options, function (settings) {
     var script = document.createElement('script');
     script.appendChild(document.createTextNode(('(' + main + ')();').replace('DYNAMIC_VARIABLE_BADGE_COUNT', settings.badge_count).replace('DYNAMIC_VARIABLE_DRAWATTENTION_COUNT', settings.draw_attention_on)));
@@ -210,7 +218,7 @@ chrome.storage.sync.get(default_options, function (settings) {
     var relayMsg = function (event) {
         switch (event.data.dest) {
         case 'content':
-            // handle anything with dest: "content" here.
+
             break;
         case 'background':
             port.postMessage(event.data, '*');
