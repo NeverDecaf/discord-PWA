@@ -1,13 +1,13 @@
 body {
     margin-bottom: 2.4em;
-    min-width: 400px;
+    width: 500px;
     font-size: 81.25%;
 }
 
 h2 {
     line-height: 1.8;
     border-bottom: 1px solid #dbdbdb;
-    margin-bottom: 1rem;
+    margin-bottom: .6rem;
     padding-bottom: 0.4rem;
 }
 
@@ -31,8 +31,14 @@ label > img {
     height: 16px;
 }
 
+textarea {
+    margin-left: 2em;
+    width: calc(100% - 3em);
+    resize: vertical;
+}
+
 @media (prefers-color-scheme: dark) {
-body {
+body, textarea, option, h3 {
     background-color: #313131;
     color: #bfbfbf;
 }

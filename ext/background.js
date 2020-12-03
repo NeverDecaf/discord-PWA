@@ -3,6 +3,11 @@ const HEADERS_TO_STRIP_LOWERCASE = [
 ];
 
 var cacheName = 'discord-pwa';
+var default_options = {
+    "custom_css": "",
+    "custom_js": ""
+};
+
 chrome.webRequest.onHeadersReceived.addListener(
     details => ({
         responseHeaders: details.responseHeaders.filter(header =>
@@ -32,6 +37,16 @@ chrome.runtime.onConnect.addListener(function (port) {
                     chrome.tabs.insertCSS(tid, {
                         code: request.payload,
                         frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                    });
+                    chrome.storage.sync.get(default_options, function (items) {
+                        chrome.tabs.insertCSS(tid, {
+                            code: items.custom_css,
+                            frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                        });
+                        chrome.tabs.executeScript(tid, {
+                            code: items.custom_js,
+                            frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                        });
                     });
                 });
                 break;

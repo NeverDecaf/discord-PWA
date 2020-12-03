@@ -1,13 +1,15 @@
 function load_options() {
     var default_options = {
         "badge_count": "mentions",
-        "draw_attention_on": "messages"
+        "draw_attention_on": "messages",
+        "custom_css": "",
+        "custom_js": ""
     };
     chrome.storage.sync.get(default_options, function (items) {
         for (const [setting, value] of Object.entries(items)) {
             let node = document.getElementById(setting);
             node.value = value;
-            node.addEventListener("change", e => {
+            node.addEventListener("input", e => {
                 const setval = e.target.value;
                 chrome.storage.sync.set({
                     [e.target.id]: setval
