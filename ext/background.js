@@ -42,22 +42,7 @@ chrome.runtime.onConnect.addListener(function (port) {
                             frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
                         });
                     });
-                    break;
-                case 'init':
-                    port.postMessage({
-                        dest: 'PWA',
-                        type: 'clientcss'
-                    });
-                    chrome.storage.sync.get(default_options, function (items) {
-                        port.postMessage({
-                            dest: 'PWA',
-                            type: 'customTitle',
-                            payload: items.custom_title
-                        });
-                    });
-                    break;
-                case 'discordLoaded':
-                    chrome.storage.sync.get(default_options, function (items) {
+					chrome.storage.local.get(default_options, function (items) {
                         chrome.webNavigation.getAllFrames({
                             tabId: tid
                         }, (e) => {
@@ -72,6 +57,22 @@ chrome.runtime.onConnect.addListener(function (port) {
 
                         });
                     });
+                    break;
+                case 'init':
+                    port.postMessage({
+                        dest: 'PWA',
+                        type: 'clientcss'
+                    });
+                    chrome.storage.local.get(default_options, function (items) {
+                        port.postMessage({
+                            dest: 'PWA',
+                            type: 'customTitle',
+                            payload: items.custom_title
+                        });
+                    });
+                    break;
+                case 'discordLoaded':
+                    
                     break;
                 }
                 break;

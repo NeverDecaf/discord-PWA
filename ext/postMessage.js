@@ -215,7 +215,7 @@ parent.postMessage({
             dest: 'PWA',
             type: 'init'
         }, '*');
-chrome.storage.sync.get(default_options, function (settings) {
+chrome.storage.local.get(default_options, function (settings) {
     var script = document.createElement('script');
     script.appendChild(document.createTextNode(('(' + main + ')();').replace('DYNAMIC_VARIABLE_BADGE_COUNT', settings.badge_count).replace('DYNAMIC_VARIABLE_DRAWATTENTION_COUNT', settings.draw_attention_on)));
     (document.body || document.head || document.documentElement).appendChild(script);
