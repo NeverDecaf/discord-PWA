@@ -66,6 +66,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
                     }, e.origin);
                 }));
                 break;
+            case 'customTitle':
+                document.title = e.data.payload;
+                break;
             }
             break;
         }

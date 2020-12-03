@@ -38,7 +38,7 @@ textarea {
 }
 
 @media (prefers-color-scheme: dark) {
-body, textarea, option, h3 {
+body, textarea, option, h3, input[type=text] {
     background-color: #313131;
     color: #bfbfbf;
 }

@@ -102,6 +102,10 @@ function main() {
             dest: 'PWA',
             type: 'discordLoaded'
         }, '*');
+		window.postMessage({
+            dest: 'background',
+            type: 'discordLoaded'
+        }, '*');
 
         // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
         const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);

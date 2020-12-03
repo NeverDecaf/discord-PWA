@@ -3,7 +3,8 @@ function load_options() {
         "badge_count": "mentions",
         "draw_attention_on": "messages",
         "custom_css": "",
-        "custom_js": ""
+        "custom_js": "",
+        "custom_title": "DISCORD"
     };
     chrome.storage.sync.get(default_options, function (items) {
         for (const [setting, value] of Object.entries(items)) {

@@ -5,7 +5,8 @@ const HEADERS_TO_STRIP_LOWERCASE = [
 var cacheName = 'discord-pwa';
 var default_options = {
     "custom_css": "",
-    "custom_js": ""
+    "custom_js": "",
+    "custom_title": "DISCORD"
 };
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -23,38 +24,56 @@ chrome.runtime.onConnect.addListener(function (port) {
     var currentAttentionState = false;
     port.onMessage.addListener(
         function (request, senderPort) {
-            switch (request.type) {
-            case 'drawAttention':
-                currentAttentionState = request.payload > 0;
-                chrome.windows.update(wid, {
-                    drawAttention: currentAttentionState
-                });
-                break;
-            case 'clientcss':
-                chrome.webNavigation.getAllFrames({
-                    tabId: tid
-                }, (e) => {
-                    chrome.tabs.insertCSS(tid, {
-                        code: request.payload,
-                        frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+            switch (request.dest) {
+            case 'background':
+                switch (request.type) {
+                case 'drawAttention':
+                    currentAttentionState = request.payload > 0;
+                    chrome.windows.update(wid, {
+                        drawAttention: currentAttentionState
+                    });
+                    break;
+                case 'clientcss':
+                    chrome.webNavigation.getAllFrames({
+                        tabId: tid
+                    }, (e) => {
+                        chrome.tabs.insertCSS(tid, {
+                            code: request.payload,
+                            frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                        });
+                    });
+                    break;
+                case 'init':
+                    port.postMessage({
+                        dest: 'PWA',
+                        type: 'clientcss'
                     });
                     chrome.storage.sync.get(default_options, function (items) {
-                        chrome.tabs.insertCSS(tid, {
-                            code: items.custom_css,
-                            frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
-                        });
-                        chrome.tabs.executeScript(tid, {
-                            code: items.custom_js,
-                            frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                        port.postMessage({
+                            dest: 'PWA',
+                            type: 'customTitle',
+                            payload: items.custom_title
                         });
                     });
-                });
-                break;
-            case 'init':
-                port.postMessage({
-                    dest: 'PWA',
-                    type: 'clientcss'
-                });
+                    break;
+                case 'discordLoaded':
+                    chrome.storage.sync.get(default_options, function (items) {
+                        chrome.webNavigation.getAllFrames({
+                            tabId: tid
+                        }, (e) => {
+                            chrome.tabs.insertCSS(tid, {
+                                code: items.custom_css,
+                                frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                            });
+                            chrome.tabs.executeScript(tid, {
+                                code: items.custom_js,
+                                frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                            });
+
+                        });
+                    });
+                    break;
+                }
                 break;
             }
         }
