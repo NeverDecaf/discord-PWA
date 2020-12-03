@@ -6,13 +6,13 @@ function load_options() {
         "custom_js": "",
         "custom_title": "DISCORD"
     };
-    chrome.storage.sync.get(default_options, function (items) {
+    chrome.storage.local.get(default_options, function (items) {
         for (const [setting, value] of Object.entries(items)) {
             let node = document.getElementById(setting);
             node.value = value;
             node.addEventListener("input", e => {
                 const setval = e.target.value;
-                chrome.storage.sync.set({
+                chrome.storage.local.set({
                     [e.target.id]: setval
                 }, function () {
                     if (chrome.runtime.lastError) {

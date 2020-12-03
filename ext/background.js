@@ -42,21 +42,6 @@ chrome.runtime.onConnect.addListener(function (port) {
                             frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
                         });
                     });
-					chrome.storage.local.get(default_options, function (items) {
-                        chrome.webNavigation.getAllFrames({
-                            tabId: tid
-                        }, (e) => {
-                            chrome.tabs.insertCSS(tid, {
-                                code: items.custom_css,
-                                frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
-                            });
-                            chrome.tabs.executeScript(tid, {
-                                code: items.custom_js,
-                                frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
-                            });
-
-                        });
-                    });
                     break;
                 case 'init':
                     port.postMessage({
@@ -72,7 +57,20 @@ chrome.runtime.onConnect.addListener(function (port) {
                     });
                     break;
                 case 'discordLoaded':
-                    
+                    chrome.storage.local.get(default_options, function (items) {
+                        chrome.webNavigation.getAllFrames({
+                            tabId: tid
+                        }, (e) => {
+                            chrome.tabs.insertCSS(tid, {
+                                code: items.custom_css,
+                                frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                            });
+                            chrome.tabs.executeScript(tid, {
+                                code: items.custom_js,
+                                frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
+                            });
+                        });
+                    });
                     break;
                 }
                 break;
