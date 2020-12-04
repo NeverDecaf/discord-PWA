@@ -202,28 +202,23 @@ function main() {
         }
     });
 }
-
 var default_options = {
     "badge_count": "mentions",
     "draw_attention_on": "messages"
 };
-
 var port = chrome.runtime.connect({
     name: "discord-pwa"
 });
 parent.postMessage({
-            dest: 'PWA',
-            type: 'init'
-        }, '*');
+    dest: 'PWA',
+    type: 'init'
+}, '*');
 chrome.storage.local.get(default_options, function (settings) {
     var script = document.createElement('script');
     script.appendChild(document.createTextNode(('(' + main + ')();').replace('DYNAMIC_VARIABLE_BADGE_COUNT', settings.badge_count).replace('DYNAMIC_VARIABLE_DRAWATTENTION_COUNT', settings.draw_attention_on)));
     (document.body || document.head || document.documentElement).appendChild(script);
     var relayMsg = function (event) {
         switch (event.data.dest) {
-        case 'content':
-
-            break;
         case 'background':
             port.postMessage(event.data, '*');
             break;
@@ -245,6 +240,8 @@ chrome.storage.local.get(default_options, function (settings) {
             switch (request.dest) {
             case 'PWA':
                 parent.postMessage(request, '*');
+                break;
+            case 'content':
                 break;
             }
         }

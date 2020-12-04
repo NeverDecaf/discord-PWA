@@ -54,15 +54,11 @@ chrome.runtime.onConnect.addListener(function (port) {
                             type: 'customTitle',
                             payload: items.custom_title
                         });
-                    });
-                    break;
-                case 'discordLoaded':
-                    chrome.storage.local.get(default_options, function (items) {
                         chrome.webNavigation.getAllFrames({
                             tabId: tid
                         }, (e) => {
-                            chrome.tabs.insertCSS(tid, {
-                                code: items.custom_css,
+                            chrome.tabs.executeScript(tid, {
+                                code: "let style = document.createElement('style'); style.textContent = `" + items.custom_css + "`; document.head.append(style);",
                                 frameId: e.filter(el => el.parentFrameId == 0)[0].frameId
                             });
                             chrome.tabs.executeScript(tid, {
@@ -71,6 +67,8 @@ chrome.runtime.onConnect.addListener(function (port) {
                             });
                         });
                     });
+                    break;
+                case 'discordLoaded':
                     break;
                 }
                 break;
