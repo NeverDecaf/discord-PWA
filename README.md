@@ -19,7 +19,7 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 5. To launch the app visit `chrome://apps/` (after first installing it from the link above)
 6. After lauching you can pin the app to your taskbar (on windows) and it will essentially function as a stand-alone program
 #### If drag-and-drop install fails, try this workaround
-1. Download [the crx file](https://neverdecaf.github.io/discord-PWA/Discord-PWA-Bypass.crx) and extract its contents. ([Download the directory from source](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/NeverDecaf/discord-PWA/tree/master/ext) if your browser blocks CRX files.)
+1. Download [the crx file](https://neverdecaf.github.io/discord-PWA/Discord-PWA-Bypass.crx) and extract its contents. ([Download the directory from source](https://neverdecaf.github.io/discord-PWA/ext.zip) if your browser blocks CRX files.)
 2. Visit chrome://extensions/ and turn on developer mode (toggle in top right)
 3. Click `Load unpacked` and select the directory you extracted the crx to.
 #### If discord iframe does not load (despite having the extension installed)
