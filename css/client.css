@@ -1,5 +1,5 @@
 div[class *= baseLayer] > div[class |= container] > nav[class *= guilds] + div[class *= base] {
-    border-radius: 8px 0 0 0
+    border-radius: 8px 0 0 8px
 }
 nav[class ^= wrapper] div[class *= scroller]:not([class *= scrollerWrap]) {
     padding-top: 4px
