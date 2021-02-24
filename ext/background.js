@@ -41,9 +41,10 @@ chrome.webRequest.onHeadersReceived.addListener(
                 !HEADERS_TO_STRIP_LOWERCASE.includes(header.name.toLowerCase()))
         }
     }, {
-        urls: ['https://discord.com/*']
+        urls: ['https://discord.com/*'],
+        types: ['sub_frame']
     },
-    ['blocking', 'responseHeaders']);
+    ['blocking', 'responseHeaders', chrome.webRequest.OnHeadersReceivedOptions.EXTRA_HEADERS]);
 
 chrome.runtime.onConnect.addListener(function (port) {
     var wid = port.sender.tab.windowId;
