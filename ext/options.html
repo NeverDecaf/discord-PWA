@@ -36,8 +36,8 @@
 		<h2>Custom CSS</h2>
 		<div>
 			<textarea id="custom_css" rows="4"></textarea>
-			<label title="Needed for styles that use @import or url(), leaves you vulnerable to XSS attacks.">
-				<input type="checkbox" id="relax_CSP_styles"/> <span><font color="red"><b>Remove Content-Security-Policy header.</b></font></span>
+			<label title="Only enable if needed; styles that use @import or url() need this.">
+				<input type="checkbox" id="relax_CSP_styles"/> <span>Allow third party images/styles.</span>
 			</label>
 		</div>
 		<h2>Custom Javascript</h2>
