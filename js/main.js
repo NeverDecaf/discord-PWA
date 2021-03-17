@@ -54,7 +54,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             }, e.origin);
                         }
                     }).catch(err => {
-                        console.log('Error checking for extension updates.');
+                        console.error('Error checking for extension updates.');
                     })
                 break;
             case 'clientcss':

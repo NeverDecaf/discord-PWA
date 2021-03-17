@@ -2,13 +2,22 @@ var default_options = {
     "badge_count": "mentions",
     "draw_attention_on": "messages"
 };
-var port = chrome.runtime.connect({
-    name: "discord-pwa"
-});
 parent.postMessage({
     dest: 'PWA',
     type: 'init'
 }, '*');
+
+function extMessage(data) {
+    try {
+        chrome.runtime.sendMessage(data);
+    } catch (e) {
+        if (e.message == 'Extension context invalidated.')
+            parent.postMessage({
+                dest: 'PWA',
+                type: 'refresh'
+            }, '*');
+    }
+}
 chrome.storage.local.get(default_options, function (settings) {
     let script = document.createElement('script');
     script.setAttribute('type', 'text/javascript');
@@ -17,7 +26,7 @@ chrome.storage.local.get(default_options, function (settings) {
     var relayMsg = function (event) {
         switch (event.data.dest) {
         case 'background':
-            port.postMessage(event.data, '*');
+            extMessage(event.data);
             break;
         case 'PWA':
             parent.postMessage(event.data, '*');
@@ -25,13 +34,11 @@ chrome.storage.local.get(default_options, function (settings) {
         case 'content':
             switch (event.data.type) {
             case 'discordLoaded':
-
                 window.postMessage({
                     dest: 'iframe',
                     type: 'badgeCount',
                     payload: settings.badge_count
                 }, '*');
-
                 window.postMessage({
                     dest: 'iframe',
                     type: 'drawAttentionCount',
@@ -43,15 +50,8 @@ chrome.storage.local.get(default_options, function (settings) {
         }
     };
     window.addEventListener("message", relayMsg);
-    port.onDisconnect.addListener(() => {
-        window.removeEventListener("message", relayMsg);
-        parent.postMessage({
-            dest: 'PWA',
-            type: 'refresh'
-        }, '*');
-    });
-    port.onMessage.addListener(
-        function (request, senderPort) {
+    chrome.runtime.onMessage.addListener(
+        function (request, sender, sendResponse) {
             switch (request.dest) {
             case 'PWA':
                 parent.postMessage(request, '*');
@@ -64,7 +64,7 @@ chrome.storage.local.get(default_options, function (settings) {
             }
         }
     );
-    port.postMessage({
+    extMessage({
         dest: 'background',
         type: 'init'
     });
