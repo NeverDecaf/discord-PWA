@@ -23,7 +23,8 @@ div[class*="toolbar-"] {
 }
 
 div[class*="container-"] section[class*="container-"][class*="themed-"],
-div[class*="searchBar-"] {
+div[class*="searchBar-"],
+div[class*="notice-"] {
 	app-region: drag;
 	-webkit-app-region: drag;
 }
