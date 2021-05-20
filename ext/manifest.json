@@ -1,7 +1,7 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Discord PWA Helper",
-    "version": "1.4.2",
+    "version": "1.4.4",
 
     "description": "Deletes X-Frame-Options response header for discord.com. Also injects some Javascript to enable notifications.",
     "icons": {
@@ -12,7 +12,7 @@
     "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtNMPPNxhMu90LdWNgUhFtRwurW593/N9HIZn4hKfpDi7/NEbOzAFH6cwI/ob+U4tgYO3c/o8aI9wmelZAGqQvAVkURWKCg5ygTLqNEP7qP+D32u7zY+bNmO8KYFP3EfzQAZzfWK3Ou7qPHBqXql6lhtffYdsv60kw/U61IrUzRkjrpRoB5Hb4RkTX/IAwkSz6nyNSzf/ox07Tef/Q+74ZbyMJL23BmcMrmuBg6DNpsYqGd8UCkhfeywS6KkXE6gKrPh73jY2coLFsSJuchUf9qSvoNvSSTge9DtZq7TKLsKZB1M+3DKV5mZ+F9o3ygYdd0LwhHO94/U5eiXP9eRibwIDAQAB",
 
     "background": {
-        "scripts": ["background.js"]
+        "service_worker": "background.js"
     },
 
     "content_scripts": [{
@@ -21,23 +21,32 @@
         "all_frames": true,
         "run_at": "document_end"
     }],
-
+	
+	"declarative_net_request": {
+		"rule_resources": [{
+			"id": "ruleset_1",
+			"enabled": true,
+			"path": "rules.json"
+		}]
+	},
     "permissions": [
-        "webRequest",
-        "webRequestBlocking",
-        "https://discord.com/*",
+		"declarativeNetRequest",
         "storage",
 		"tabs",
-		"webNavigation"
+		"webNavigation",
+		"scripting"
     ],
+	"host_permissions" : [
+		"https://discord.com/*","https://neverdecaf.github.io/*"
+	],
 
     "update_url": "https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml",
     "options_ui": {
-        "page": "options.html",
-        "chrome_style": true
+        "page": "options.html"
     },
-
-    "web_accessible_resources": [
-        "manifest.json"
-    ]
+	
+	"web_accessible_resources": [{
+		"resources": ["manifest.json","inject.js"],
+		"matches": ["https://discord.com/*","https://neverdecaf.github.io/*"]
+	}]
 }

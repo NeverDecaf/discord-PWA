@@ -18,7 +18,6 @@ function load_options() {
                         [e.target.id]: checked
                     }, function () {
                         if (chrome.runtime.lastError) {
-							console.log('err');
                             node.checked = !checked;
                         }
                     });

@@ -28,6 +28,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
             }, 1000);
         })
         .catch((error) => modal.classList.add('show'))
+		
+	if (window.navigator.windowControlsOverlay && window.navigator.windowControlsOverlay.visible) {
+		document.getElementsByName('theme-color')[0].setAttribute("content","#36393f");
+	}
 
     window.addEventListener('message', function (e) {
         switch (e.data.dest) {
@@ -54,7 +58,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                             }, e.origin);
                         }
                     }).catch(err => {
-                        console.log('Error checking for extension updates.');
+                        console.error('Error checking for extension updates.');
                     })
                 break;
             case 'clientcss':
