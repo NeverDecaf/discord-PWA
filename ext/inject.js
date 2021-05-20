@@ -25,7 +25,8 @@ window.addEventListener('message', function (ev) {
         case 'injectscript':
             let script = document.createElement('script');
             script.setAttribute('type', 'text/javascript');
-            script.textContent = 'try {'+ev.data.payload+'} catch(e) {console.error(e, e.stack)}';
+            // script.textContent = 'try {'+ev.data.payload+'} catch(e) {console.error(e, e.stack)}';
+			script.textContent = ev.data.payload;
             (document.body || document.head || document.documentElement).appendChild(script);
             break;
         }
@@ -131,7 +132,7 @@ waitForLoad(10000, () => {
     const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
     const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
     const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
-    // const DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
+    var DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
     const Dispatcher = WebpackModules.findByUniqueProperties(["Dispatcher"]).default;
 
     function addUnread() {
@@ -147,7 +148,9 @@ waitForLoad(10000, () => {
             });
         }
         // now get all unread DM channel ids and do the same.
-        WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]).getUnreadPrivateChannelIds().forEach((id) => {
+		if (DirectMessageUnreadStore === null)
+			DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
+        DirectMessageUnreadStore.getUnreadPrivateChannelIds().forEach((id) => {
             unreadMessages += UnreadChannelUtils.getUnreadCount(id);
             unreadChannels += 1;
         });
