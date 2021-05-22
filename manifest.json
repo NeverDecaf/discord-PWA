@@ -30,6 +30,6 @@
   "start_url": "./index.html",
   "display": "standalone",
   "display_override": ["window-controls-overlay"],
-  "background_color": "#202225",
+  "background_color": "#36393f",
   "theme_color": "#202225"
 }

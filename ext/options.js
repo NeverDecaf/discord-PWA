@@ -4,7 +4,7 @@ function load_options() {
         "draw_attention_on": "messages",
         "custom_css": "",
         "custom_js": "",
-        "custom_title": "DISCORD",
+        "custom_title": "Discord",
         "relax_CSP_styles": false
     };
     chrome.storage.local.get(default_options, function (items) {

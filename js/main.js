@@ -3,6 +3,7 @@ const modal = document.getElementById("extWarning");
 const extensionID = "edfpalahildnikdjdnmmoekoncglnblh";
 var modalCloseButton = document.getElementById("modalClose");
 var installedExtVersion;
+var extUpdateUrl;
 
 function version_is_newer(current, available) {
     let current_subvs = current.split(".");
@@ -23,6 +24,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         .then(response => response.json())
         .then(data => {
             installedExtVersion = data.version;
+			extUpdateUrl = data.update_url;
             extNotLoaded = setTimeout(() => {
                 document.getElementById('frame').src += ''
             }, 1000);
@@ -47,7 +49,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
                 setTimeout(() => document.getElementById('frame').src += '', 1000);
                 break;
             case 'discordLoaded':
-                fetch('https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml')
+                fetch(extUpdateUrl)
                     .then(response => response.text())
                     .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
                     .then(data => {

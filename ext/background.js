@@ -58,7 +58,7 @@ createCSPRule();
 var default_options = {
     "custom_css": "",
     "custom_js": "",
-    "custom_title": "DISCORD",
+    "custom_title": "Discord",
     "relax_CSP_styles": false
 };
 
