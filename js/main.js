@@ -56,7 +56,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
                         if (version_is_newer(installedExtVersion, data.getElementsByTagName("updatecheck")[0].getAttribute('version'))) {
                             e.source.postMessage({
                                 dest: 'iframe',
-                                type: 'updateAvailable'
+                                type: 'updateAvailable',
+								payload: data.getElementsByTagName("updatecheck")[0].getAttribute('codebase')
                             }, e.origin);
                         }
                     }).catch(err => {

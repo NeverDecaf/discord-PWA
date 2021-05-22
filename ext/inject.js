@@ -1,15 +1,15 @@
 var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
 
-function updateModal() {
-    setTimeout(updateModal, 1000);
+function updateModal(url) {
+    setTimeout(() => updateModal(url), 1000);
 }
 window.addEventListener('message', function (ev) {
     switch (ev.data.dest) {
     case 'iframe':
         switch (ev.data.type) {
         case 'updateAvailable':
-            updateModal();
+            updateModal(ev.data.payload);
             break;
         case 'badgeCount':
             BADGE_COUNT = ev.data.payload;
@@ -214,12 +214,12 @@ waitForLoad(10000, () => {
         });
     }
 
-    updateModal = function () {
+    updateModal = function (url) {
         return showConfirmationModal('Update Available', 'An update for the Discord PWA extension is available.', {
             confirmText: "Download now",
             cancelText: "Remind me later",
             onConfirm: () => {
-                window.open('https://github.com/NeverDecaf/discord-PWA/raw/master/Discord-PWA-Bypass.crx', '_blank');
+                window.open(url, '_blank');
             }
         });
     }

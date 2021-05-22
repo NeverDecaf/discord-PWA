@@ -5,6 +5,7 @@ function load_options() {
         "custom_css": "",
         "custom_js": "",
         "custom_title": "Discord",
+		"custom_theme": "#202225",
         "relax_CSP_styles": false
     };
     chrome.storage.local.get(default_options, function (items) {
