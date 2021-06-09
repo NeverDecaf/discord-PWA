@@ -29,5 +29,6 @@ A wrapper for the discord web client as a Progressive Web Application, for use w
 - It is possible to open multiple windows at once, which causes undefined notification behaviour.
 - The "extension is required" warning may appear even if discord successfully loads, you can safely close the modal if this happens.
 #### Notes
+- To hide the status bar, set the flag `chrome://flags/#enable-desktop-pwas-remove-status-bar` to `Enabled`. (This will probably become the default in the future.)
 - Taskbar behaviour is customizable in the [extension's options](chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html) `chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html`.
 - Code modified from [https://github.com/jamesjohnson280/hello-pwa](https://github.com/jamesjohnson280/hello-pwa), [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp) code was also used/referenced.
