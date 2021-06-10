@@ -1,5 +1,6 @@
 body {
   font-family: sans-serif;
+  background: #202225;
 }
 /* Make content area fill the entire browser window */
 html,
@@ -27,6 +28,24 @@ html,
 }
 #main {
   z-index: 2;
+  color: #5865F2;
+}
+#main .button {
+  background-color: #5865F2;
+  border-radius: 28px;
+  font-size: 20px;
+  padding: 16px 32px;
+  color: white;
+  margin: 20px;
+  text-decoration: none;
+}
+#main .button:hover {
+  background-color: #8ea1e1;
+  cursor: pointer;
+}
+#main h2, #main h4 {
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 .modal {
   display: none; /* Hidden by default */

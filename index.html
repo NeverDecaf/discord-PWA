@@ -18,15 +18,15 @@
 
 <body class="fullscreen">
 	<div class="container" id="main">
-		<h1 class="title">Install as PWA to use</h1> <img src='./PWA_Install_Button.png' /> <a href='./Discord-PWA-Bypass.crx'><h2 class="subtitle">You will also need the Chrome Extension</h2></a>
+		<h2>The extension is required to use this PWA</h2><a class="button" id="PWAInstallButton">Install PWA</a><a class="button" id="ExtensionInstallButton" href='./Discord-PWA-Bypass.crx'>Install Extension</a><h4>This website is not affiliated with nor endorsed by Discord.</h4>
 	</div>
 	<div class="modal" id="extWarning">
 		<div class="modal-content">
 			<span class="close" id="modalClose">&times;</span><h1 class="title">The extension is required to display discord.com in an iframe</h1><a href='./Discord-PWA-Bypass.crx'><h2 class="subtitle">Please install it and relaunch this PWA</h2></a>
 		</div>
 	</div>
+	<iframe id="frame" title="Discord Frame" width="100%" height="100%" frameborder="0" allow="microphone; camera; fullscreen"></iframe>
 	<script src="js/main.js"></script>
-	<iframe id="frame" src="https://discord.com/channels/@me" title="Discord Frame" width="100%" height="100%" frameborder="0" allow="microphone; camera; fullscreen"></iframe>
 </body>
 
 </html>

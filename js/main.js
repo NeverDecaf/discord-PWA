@@ -93,3 +93,30 @@ window.onclick = function (event) {
 modalCloseButton.onclick = function () {
     modal.classList.remove('show');
 }
+
+// PWA Install page stuff
+const loadDiscord = () => document.getElementById("frame").src || (document.getElementById("frame").src = "https://discord.com/channels/@me")
+const isInStandaloneMode = () =>
+      (window.matchMedia('(display-mode: standalone)').matches) || (window.matchMedia('(display-mode: fullscreen)').matches) || (window.navigator.standalone) || document.referrer.includes('android-app://');
+if (isInStandaloneMode()) {
+	loadDiscord()
+}
+else {
+	// https://web.dev/customize-install/
+	let deferredPrompt;
+
+	window.addEventListener('beforeinstallprompt', (e) => {
+	  e.preventDefault();
+	  deferredPrompt = e;
+	});
+	document.getElementById('PWAInstallButton').addEventListener('click', async () => {
+	  deferredPrompt.prompt();
+	  const { outcome } = await deferredPrompt.userChoice;
+	  deferredPrompt = null;
+	});
+}
+window.matchMedia('(display-mode: standalone)').addEventListener('change', (evt) => {
+  if (evt.matches) {
+    loadDiscord()
+  }
+});
