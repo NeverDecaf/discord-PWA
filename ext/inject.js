@@ -108,7 +108,7 @@ WebpackModules = (() => {
 
 function waitForLoad(maxtimems, callback) {
     var interval = 100; // ms
-    if (maxtimems > 0 && (typeof webpackJsonp === 'undefined' || WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]) === null)) {
+    if (maxtimems > 0 && (typeof webpackJsonp === 'undefined' || WebpackModules.findByUniqueProperties(["getAllReadStates"]) === null)) {
         setTimeout(() => waitForLoad(maxtimems - interval, callback), interval);
     } else {
         callback();
@@ -129,33 +129,23 @@ waitForLoad(10000, () => {
         type: 'discordLoaded'
     }, '*');
     // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
-    const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
-    const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
-    const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
-    var DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
+	const MessageStore = WebpackModules.findByUniqueProperties(["getAllReadStates"]);
+    // const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
+    // const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
+    // const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
+    // var DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
     const Dispatcher = WebpackModules.findByUniqueProperties(["Dispatcher"]).default;
+	const MuteStore = WebpackModules.findByUniqueProperties(['isGuildOrCategoryOrChannelMuted'])//'isMuted','isChannelMuted','_isCategoryMuted'])
 
     function addUnread() {
-        var unreadMessages = 0;
-        var unreadChannels = 0;
-        // for every unread guild, iterate over every channel and sum unread messages
-        for (let g in UnreadGuildUtils.getUnreadGuilds()) {
-            let channels = GuildChannelStore.getChannels(g).SELECTABLE;
-            channels.forEach((e) => {
-                let unread = UnreadChannelUtils.getUnreadCount(e.channel.id);
-                unreadMessages += unread;
-                unreadChannels += ~~(unread > 0);
-            });
-        }
-        // now get all unread DM channel ids and do the same.
-		if (DirectMessageUnreadStore === null)
-			DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
-        DirectMessageUnreadStore.getUnreadPrivateChannelIds().forEach((id) => {
-            unreadMessages += UnreadChannelUtils.getUnreadCount(id);
-            unreadChannels += 1;
-        });
-        // hasAnyMessage = Object.keys(UnreadGuildUtils.getUnreadGuilds()).length || Object.keys(DirectMessageUnreadStore.getUnreadPrivateChannelIds()).length;
-        var unreadMentions = UnreadGuildUtils.getTotalMentionCount();
+        var unreadMessages = 0, unreadChannels = 0, unreadMentions = 0;
+		MessageStore.getAllReadStates().forEach(channel => {
+			if (!MuteStore.isGuildOrCategoryOrChannelMuted(channel._guildId,channel.channelId)) {
+				unreadMessages += channel.unreadCount
+				unreadChannels += ~~(channel.unreadCount > 0)
+				unreadMentions += channel.mentionCount
+			}
+		})
         data = {
             messages: unreadMessages,
             mentions: unreadMentions,
