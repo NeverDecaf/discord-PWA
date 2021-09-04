@@ -141,9 +141,9 @@ waitForLoad(10000, () => {
         var unreadMessages = 0, unreadChannels = 0, unreadMentions = 0;
 		MessageStore.getAllReadStates().forEach(channel => {
 			if (!MuteStore.isGuildOrCategoryOrChannelMuted(channel._guildId,channel.channelId)) {
-				unreadMessages += channel.unreadCount
-				unreadChannels += ~~(channel.unreadCount > 0)
-				unreadMentions += channel.mentionCount
+				unreadMessages += channel._unreadCount
+				unreadChannels += ~~(channel._unreadCount > 0)
+				unreadMentions += channel._mentionCount
 			}
 		})
         data = {
