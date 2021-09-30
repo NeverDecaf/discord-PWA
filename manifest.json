@@ -2,22 +2,22 @@
   "name": "Discord PWA",
   "short_name": "Discord PWA",
   "icons": [{
-    "src": "images/128.png",
+      "src": "images/128_icon.png",
       "sizes": "128x128",
       "type": "image/png",
       "purpose": "any"
     }, {
-      "src": "images/144.png",
+      "src": "images/144_icon.png",
       "sizes": "144x144",
       "type": "image/png",
       "purpose": "any"
     }, {
-      "src": "images/152.png",
-      "sizes": "152x152",
+      "src": "images/144_maskable.png",
+      "sizes": "144x144",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     }, {
-      "src": "images/192.png",
+      "src": "images/192_icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
@@ -27,12 +27,12 @@
       "type": "image/png",
       "purpose": "maskable"
     }, {
-      "src": "images/256.png",
+      "src": "images/256_icon.png",
       "sizes": "256x256",
       "type": "image/png",
       "purpose": "any"
     }, {
-      "src": "images/512.png",
+      "src": "images/512_icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
