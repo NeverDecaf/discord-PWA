@@ -1,6 +1,5 @@
 var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
-
 function updateModal(url) {
     setTimeout(() => updateModal(url), 1000);
 }
@@ -33,18 +32,30 @@ window.addEventListener('message', function (ev) {
         break;
     }
 });
+
 //WebpackModules from BetterDiscord source
 WebpackModules = (() => {
-    const req = webpackJsonp.push([
-        [], {
-            __extra_id__: (module, exports, req) => module.exports = req
-        },
-        [
-            ["__extra_id__"]
-        ]
-    ]);
-    delete req.m.__extra_id__;
-    delete req.c.__extra_id__;
+	const req = (() => {
+		this.chunkName = 'webpackChunkdiscord_app'
+        // if (this._require) return this._require;
+        const id = "bd-webpackmodules";
+        let __webpack_require__ = undefined;
+        if (typeof (webpackJsonp) !== "undefined") {
+            __webpack_require__ = window.webpackJsonp.push([[], {
+                [id]: (module, exports, __internal_require__) => module.exports = __internal_require__
+            }, [[id]]]);
+        } else if (typeof (window[this.chunkName]) !== "undefined") {
+            window[this.chunkName].push([[id], 
+                {},
+                __internal_require__ => __webpack_require__ = __internal_require__
+            ]);
+        }
+
+        delete __webpack_require__.m[id];
+        delete __webpack_require__.c[id];
+        // return this._require = __webpack_require__;
+		return __webpack_require__
+    })();
 
     const shouldProtect = theModule => {
         if (theModule.remove && theModule.set && theModule.clear && theModule.get && !theModule.sort) return true;
@@ -108,13 +119,12 @@ WebpackModules = (() => {
 
 function waitForLoad(maxtimems, callback) {
     var interval = 100; // ms
-    if (maxtimems > 0 && (typeof webpackJsonp === 'undefined' || WebpackModules.findByUniqueProperties(["getAllReadStates"]) === null)) {
+    if (maxtimems > 0 && (typeof WebpackModules === 'undefined' || WebpackModules.findByUniqueProperties(["getAllReadStates"]) === null)) {
         setTimeout(() => waitForLoad(maxtimems - interval, callback), interval);
     } else {
         callback();
     }
 }
-
 waitForLoad(10000, () => {
     window.postMessage({
         dest: 'PWA',
@@ -128,13 +138,14 @@ waitForLoad(10000, () => {
         dest: 'content',
         type: 'discordLoaded'
     }, '*');
+	
     // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
 	const MessageStore = WebpackModules.findByUniqueProperties(["getAllReadStates"]);
     // const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
     // const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
     // const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
     // var DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
-    const Dispatcher = WebpackModules.findByUniqueProperties(["Dispatcher"]).default;
+    const Dispatcher = WebpackModules.findByUniqueProperties(["dirtyDispatch"]);
 	const MuteStore = WebpackModules.findByUniqueProperties(['isGuildOrCategoryOrChannelMuted'])//'isMuted','isChannelMuted','_isCategoryMuted'])
 
     function addUnread() {
