@@ -26,7 +26,7 @@ div[class*="container-"] section[class*="container-"][class*="themed-"],
 div[class*="searchBar-"],
 div[class*="notice-"] {
 	app-region: drag;
-	-webkit-app-region: drag;
+	--webkit-app-region: drag;
 }
 
 div[class*="container-"] nav[class*="wrapper-"][class*="guilds-"] {
@@ -37,7 +37,7 @@ div[class*="tutorialContainer-"]::before {
 	display: block;
 	content: '';
 	app-region: drag;
-	-webkit-app-region: drag;
+	--webkit-app-region: drag;
 	height: env(titlebar-area-height, 0);
 	background: no-repeat;
 	background-position: center;

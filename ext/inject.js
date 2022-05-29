@@ -1,5 +1,6 @@
 var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
+const chunkName = 'webpackChunkdiscord_app'
 function updateModal(url) {
     setTimeout(() => updateModal(url), 1000);
 }
@@ -36,16 +37,14 @@ window.addEventListener('message', function (ev) {
 //WebpackModules from BetterDiscord source
 WebpackModules = (() => {
 	const req = (() => {
-		this.chunkName = 'webpackChunkdiscord_app'
-        // if (this._require) return this._require;
-        const id = "bd-webpackmodules";
+        const id = "pwa-webpackmodules";
         let __webpack_require__ = undefined;
         if (typeof (webpackJsonp) !== "undefined") {
             __webpack_require__ = window.webpackJsonp.push([[], {
                 [id]: (module, exports, __internal_require__) => module.exports = __internal_require__
             }, [[id]]]);
-        } else if (typeof (window[this.chunkName]) !== "undefined") {
-            window[this.chunkName].push([[id], 
+        } else if (typeof (window[chunkName]) !== "undefined") {
+            window[chunkName].push([[id], 
                 {},
                 __internal_require__ => __webpack_require__ = __internal_require__
             ]);
@@ -53,7 +52,6 @@ WebpackModules = (() => {
 
         delete __webpack_require__.m[id];
         delete __webpack_require__.c[id];
-        // return this._require = __webpack_require__;
 		return __webpack_require__
     })();
 
