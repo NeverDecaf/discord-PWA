@@ -4,6 +4,7 @@ const extensionID = "edfpalahildnikdjdnmmoekoncglnblh";
 var modalCloseButton = document.getElementById("modalClose");
 var installedExtVersion;
 var extUpdateUrl;
+var wco_integration = false;
 
 function version_is_newer(current, available) {
     let current_subvs = current.split(".");
@@ -17,6 +18,8 @@ function version_is_newer(current, available) {
     }
     return false;
 }
+var theme_element = document.getElementById("theme-color");
+theme_element.setAttribute("old-theme", theme_element.getAttribute("content"));
 
 window.addEventListener("DOMContentLoaded", (event) => {
     var extNotLoaded;
@@ -31,21 +34,13 @@ window.addEventListener("DOMContentLoaded", (event) => {
         })
         .catch((error) => modal.classList.add("show"));
 
-    if (
-        window.navigator.windowControlsOverlay &&
-        window.navigator.windowControlsOverlay.visible
-    ) {
-        document
-            .getElementsByName("theme-color")[0]
-            .setAttribute("content", "#36393f");
-    }
-
     window.addEventListener("message", function (e) {
         switch (e.data.dest) {
             case "PWA":
                 switch (e.data.type) {
                     case "init":
                         clearTimeout(extNotLoaded);
+                        wco_integration = !!e.data.payload;
                         break;
                     case "badge":
                         navigator.setAppBadge(e.data.payload);
@@ -57,6 +52,49 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         );
                         break;
                     case "discordLoaded":
+                        // inject some WCO vars as CSS vars
+                        if (
+                            navigator.windowControlsOverlay &&
+                            navigator.windowControlsOverlay
+                                .getTitlebarAreaRect &&
+                            wco_integration
+                        ) {
+                            function update_wco(visible, titlebarAreaRect) {
+                                if (visible) {
+                                    theme_element.setAttribute(
+                                        "content",
+                                        "#36393f"
+                                    );
+                                } else {
+                                    theme_element.setAttribute(
+                                        "content",
+                                        theme_element.getAttribute("old-theme")
+                                    );
+                                }
+                                e.source.postMessage(
+                                    {
+                                        dest: "iframe",
+                                        type: "injectcss",
+                                        payload:
+                                            ":root{--titlebar-area-height: " +
+                                            (titlebarAreaRect?.height ||
+                                                "'invalid'") +
+                                            ";}",
+                                    },
+                                    e.origin
+                                );
+                            }
+                            update_wco(
+                                navigator.windowControlsOverlay.visible,
+                                navigator.windowControlsOverlay.getTitlebarAreaRect()
+                            );
+                            navigator.windowControlsOverlay.ongeometrychange = (
+                                ev
+                            ) => {
+                                update_wco(ev.visible, ev.titlebarAreaRect);
+                            };
+                        }
+                        // check for updates
                         fetch(extUpdateUrl)
                             .then((response) => response.text())
                             .then((str) =>
@@ -92,7 +130,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                             })
                             .catch((err) => {
                                 console.error(
-                                    "Error checking for extension updates."
+                                    "Error checking for Discord PWA extension updates."
                                 );
                             });
                         break;

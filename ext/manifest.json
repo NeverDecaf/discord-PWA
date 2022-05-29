@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Discord PWA Helper",
-    "version": "1.5.2",
+    "version": "1.5.3",
 
     "description": "Deletes X-Frame-Options response header for discord.com. Also injects some Javascript to enable notifications.",
     "icons": {
@@ -15,43 +15,54 @@
         "service_worker": "background.js"
     },
 
-    "content_scripts": [{
-        "matches": ["https://discord.com/*"],
-        "js": ["postMessage.js"],
-        "all_frames": true,
-        "run_at": "document_end"
-    },{
-        "matches": ["https://neverdecaf.github.io/discord-PWA/*"],
-        "js": ["customTheme.js"],
-        "all_frames": false,
-        "run_at": "document_end"
-    }],
-	
-	"declarative_net_request": {
-		"rule_resources": [{
-			"id": "ruleset_1",
-			"enabled": true,
-			"path": "rules.json"
-		}]
-	},
-    "permissions": [
-		"declarativeNetRequest",
-        "storage",
-		"tabs",
-		"webNavigation",
-		"scripting"
+    "content_scripts": [
+        {
+            "matches": ["https://discord.com/*"],
+            "js": ["postMessage.js"],
+            "all_frames": true,
+            "run_at": "document_end"
+        },
+        {
+            "matches": ["https://neverdecaf.github.io/discord-PWA/*"],
+            "js": ["customTheme.js"],
+            "all_frames": false,
+            "run_at": "document_end"
+        }
     ],
-	"host_permissions" : [
-		"https://discord.com/*","https://neverdecaf.github.io/*"
-	],
+
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "ruleset_1",
+                "enabled": true,
+                "path": "rules.json"
+            }
+        ]
+    },
+    "permissions": [
+        "declarativeNetRequest",
+        "storage",
+        "tabs",
+        "webNavigation",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://discord.com/*",
+        "https://neverdecaf.github.io/*"
+    ],
 
     "update_url": "https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml",
     "options_ui": {
         "page": "options.html"
     },
-	
-	"web_accessible_resources": [{
-		"resources": ["manifest.json","inject.js"],
-		"matches": ["https://discord.com/*","https://neverdecaf.github.io/*"]
-	}]
+
+    "web_accessible_resources": [
+        {
+            "resources": ["manifest.json", "inject.js"],
+            "matches": [
+                "https://discord.com/*",
+                "https://neverdecaf.github.io/*"
+            ]
+        }
+    ]
 }
