@@ -40,7 +40,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                 switch (e.data.type) {
                     case "init":
                         clearTimeout(extNotLoaded);
-                        wco_integration = !!e.data.payload;
+                        wco_integration = !!e.data?.payload?.wco_integration;
                         break;
                     case "badge":
                         navigator.setAppBadge(e.data.payload);

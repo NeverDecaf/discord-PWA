@@ -23,7 +23,7 @@ chrome.storage.local.get(default_options, function (settings) {
         {
             dest: "PWA",
             type: "init",
-            payload: settings.wco_integration,
+            payload: settings,
         },
         "*"
     );
