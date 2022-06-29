@@ -159,14 +159,32 @@ WebpackModules = (() => {
         findByDisplayName,
     };
 })();
-
+// https://github.com/mwittrien/BetterDiscordAddons/blob/master/Library/_res/0BDFDB.data.json
+const UsedModules = {
+    Dispatcher: ["dirtyDispatch"],
+    UnreadGuildUtils: ["hasUnread", "getTotalMentionCount"],
+    RelationshipStore: ["getFriendIDs", "getRelationships"],
+    // MessageStore: ["getAllReadStates"],
+    // GuildChannelStore: ["getChannels", "getDefaultChannel"],
+    // UnreadChannelUtils: ["getUnreadCount", "getOldestUnreadMessageId"],
+    // DirectMessageUnreadStore: ["getUnreadPrivateChannelIds"],
+    // MuteStore: [
+    //     "isGuildOrCategoryOrChannelMuted",
+    //     "isMuted",
+    //     "isChannelMuted",
+    //     "_isCategoryMuted",
+    // ],
+    // FolderStore: ["getFlattenedGuilds"],
+    // AltChannelStore: ["getChannels", "getDefaultChannel"],
+};
 function waitForLoad(maxtimems, callback) {
     var interval = 100; // ms
     if (
         maxtimems > 0 &&
         (typeof WebpackModules === "undefined" ||
-            WebpackModules.findByUniqueProperties(["getAllReadStates"]) ===
-                null)
+            Object.values(UsedModules).some(
+                (args) => WebpackModules.findByUniqueProperties(args) === null
+            ))
     ) {
         setTimeout(() => waitForLoad(maxtimems - interval, callback), interval);
     } else {
@@ -196,35 +214,17 @@ waitForLoad(10000, () => {
         "*"
     );
 
-    // https://mwittrien.github.io/BetterDiscordAddons/Plugins/BDFDB.js
-    const MessageStore = WebpackModules.findByUniqueProperties([
-        "getAllReadStates",
-    ]);
-    // const UnreadGuildUtils = WebpackModules.findByUniqueProperties(["hasUnread", "getUnreadGuilds"]);
-    // const GuildChannelStore = WebpackModules.findByUniqueProperties(["getChannels", "getDefaultChannel"]);
-    // const UnreadChannelUtils = WebpackModules.findByUniqueProperties(["getUnreadCount", "getOldestUnreadMessageId"]);
-    // var DirectMessageUnreadStore = WebpackModules.findByUniqueProperties(["getUnreadPrivateChannelIds"]);
-    const Dispatcher = WebpackModules.findByUniqueProperties(["dirtyDispatch"]);
-    const MuteStore = WebpackModules.findByUniqueProperties([
-        "isGuildOrCategoryOrChannelMuted",
-    ]); //'isMuted','isChannelMuted','_isCategoryMuted'])
+    for (const [k, v] of Object.entries(UsedModules)) {
+        UsedModules[k] = WebpackModules.findByUniqueProperties(v);
+    }
 
     function addUnread() {
-        var unreadMessages = 0,
-            unreadChannels = 0,
-            unreadMentions = 0;
-        MessageStore.getAllReadStates().forEach((channel) => {
-            if (
-                !MuteStore.isGuildOrCategoryOrChannelMuted(
-                    channel._guildId,
-                    channel.channelId
-                )
-            ) {
-                unreadMessages += channel._unreadCount;
-                unreadChannels += ~~(channel._unreadCount > 0);
-                unreadMentions += channel._mentionCount;
-            }
-        });
+        var unreadMessages = UsedModules.UnreadGuildUtils.hasAnyUnread(),
+            unreadChannels =
+                UsedModules.UnreadGuildUtils.getMutableUnreadGuilds().size,
+            unreadMentions =
+                UsedModules.UnreadGuildUtils.getTotalMentionCount() +
+                UsedModules.RelationshipStore.getPendingCount();
         data = {
             messages: unreadMessages,
             mentions: unreadMentions,
@@ -243,24 +243,20 @@ waitForLoad(10000, () => {
             {
                 dest: "background",
                 type: "drawAttention",
-                payload: data[DRAWATTENTION_COUNT],
+                payload: data[DRAWATTENTION_COUNT] || data[BADGE_COUNT],
             },
             "*"
         );
     }
-    Dispatcher.subscribe("RPC_NOTIFICATION_CREATE", () => addUnread());
-    Dispatcher.subscribe("MESSAGE_ACK", () => addUnread());
-    Dispatcher.subscribe("WINDOW_FOCUS", (e) => {
-        if (!e.focused)
-            setTimeout(() => {
-                addUnread();
-                setTimeout(() => {
-                    addUnread();
-                }, 50);
-            }, 250);
+    UsedModules.Dispatcher.subscribe("RPC_NOTIFICATION_CREATE", () =>
+        addUnread()
+    );
+    UsedModules.Dispatcher.subscribe("MESSAGE_ACK", () => addUnread());
+    UsedModules.Dispatcher.subscribe("WINDOW_FOCUS", (e) => {
+        if (!e.focused) addUnread();
     });
-    // Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
-    // Dispatcher.subscribe('TRACK',()=>addUnread());
+    // UsedModules.Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
+    // UsedModules.Dispatcher.subscribe('TRACK',()=>addUnread());
     showConfirmationModal = function (title, content, options = {}) {
         const ModalActions = WebpackModules.findByUniqueProperties([
             "openModal",

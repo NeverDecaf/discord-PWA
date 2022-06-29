@@ -1,3 +1,5 @@
+// need atomic data storage, this will expire but should be good enough.
+const fakeLocalStorage = {};
 function createCSPRule() {
     fetch("https://discord.com/app")
         .then(function (response) {
@@ -75,7 +77,66 @@ var default_options = {
     custom_title: "Discord",
     relax_CSP_styles: false,
 };
-
+const drawAttention_options = {
+    drawAttention: false,
+    windowId: chrome.windows.WINDOW_ID_NONE,
+    toggledWindows: {},
+};
+chrome.runtime.onStartup.addListener(() =>
+    chrome.storage.local.set(drawAttention_options)
+);
+chrome.storage.local.get(drawAttention_options, (opts) => {
+    fakeLocalStorage.toggledWindows = opts.toggledWindows;
+});
+chrome.windows.onCreated.addListener((window) => {
+    fakeLocalStorage.toggledWindows[window.id] = false;
+    chrome.storage.local.set({
+        toggledWindows: fakeLocalStorage.toggledWindows,
+    });
+});
+chrome.windows.onRemoved.addListener((id) => {
+    delete fakeLocalStorage.toggledWindows[id];
+    chrome.storage.local.set({
+        windowId: chrome.windows.WINDOW_ID_NONE,
+        toggledWindows: fakeLocalStorage.toggledWindows,
+    });
+});
+const updateAttention = (id) => {
+    chrome.storage.local.get(drawAttention_options, (data) => {
+        console.log(data.windowId, id);
+        if (
+            data.windowId != chrome.windows.WINDOW_ID_NONE &&
+            id != data.windowId
+        ) {
+            // send a double request to toggle on.
+            if (!fakeLocalStorage.toggledWindows[data.windowId]) {
+                // first time, do one request only.
+                fakeLocalStorage.toggledWindows[data.windowId] = true;
+                chrome.windows.update(data.windowId, {
+                    drawAttention: data.drawAttention,
+                });
+            } else {
+                chrome.windows.update(
+                    data.windowId,
+                    {
+                        drawAttention: false,
+                    },
+                    (x) =>
+                        chrome.windows.update(data.windowId, {
+                            drawAttention: data.drawAttention,
+                        })
+                );
+            }
+            chrome.storage.local.set({
+                toggledWindows: fakeLocalStorage.toggledWindows,
+            });
+        }
+    });
+};
+// onFocusChanged is incredibly broken [TOo5q4NLCpk], rely on discord's js focus lost detection instead.
+// chrome.windows.onFocusChanged.addListener((id) => {
+//     updateAttention(id);
+// });
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     switch (request.dest) {
         case "background":
@@ -92,9 +153,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                         : 0;
                     switch (request.type) {
                         case "drawAttention":
-                            chrome.windows.update(sender.tab.windowId, {
-                                drawAttention: request.payload > 0,
-                            });
+                            chrome.storage.local.set(
+                                {
+                                    drawAttention: request.payload > 0,
+                                    windowId: sender.tab.windowId,
+                                },
+                                () =>
+                                    updateAttention(
+                                        chrome.windows.WINDOW_ID_NONE
+                                    )
+                            );
                             break;
                         case "clientcss":
                             chrome.scripting.insertCSS({
