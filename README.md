@@ -21,7 +21,7 @@ A wrapper for the Discord web client as a Progressive Web Application, for use w
 #### If discord iframe does not load (despite having the extension installed)
 - **Remove** and re-install the extension. This happens when multiple extensions try to modify headers for a page; the last installed extension has priority while others are blocked access.
 #### Bugs
-- Unread count only includes messages after the PWA has started, meaning the icon will not flash/highlight upon startup.
+- ~~Unread count only includes messages after the PWA has started, meaning the icon will not flash/highlight upon startup.~~
 - It is possible to open multiple windows at once, which causes undefined notification behaviour.
 #### Notes
 - To hide the status bar, set the flag `chrome://flags/#enable-desktop-pwas-remove-status-bar` to `Enabled`. (This will probably become the default in the future.)
