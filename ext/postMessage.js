@@ -27,12 +27,14 @@ chrome.storage.local.get(default_options, function (settings) {
         },
         "*"
     );
-    let script = document.createElement("script");
-    script.setAttribute("type", "text/javascript");
+    const script = document.createElement("script");
+    script.setAttribute("type", "module");
     script.setAttribute("src", chrome.runtime.getURL("inject.js"));
-    (document.body || document.head || document.documentElement).appendChild(
-        script
-    );
+    const head =
+        document.head ||
+        document.getElementsByTagName("head")[0] ||
+        document.documentElement;
+    head.insertBefore(script, head.lastChild);
     var relayMsg = function (event) {
         switch (event.data.dest) {
             case "background":
@@ -60,6 +62,11 @@ chrome.storage.local.get(default_options, function (settings) {
                             },
                             "*"
                         );
+                        extMessage({
+                            dest: "background",
+                            type: "init",
+                            payload: settings.wco_integration,
+                        });
                         break;
                 }
                 break;
@@ -81,10 +88,5 @@ chrome.storage.local.get(default_options, function (settings) {
                 window.postMessage(request, "*");
                 break;
         }
-    });
-    extMessage({
-        dest: "background",
-        type: "init",
-        payload: settings.wco_integration,
     });
 });
