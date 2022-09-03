@@ -171,11 +171,12 @@ modalCloseButton.onclick = function () {
 
 // PWA Install page stuff
 const loadDiscord = () =>
-    document.getElementById("frame").src ||
+    document.getElementById("frame").src.match(/discord\.com/) ||
     (document.getElementById("frame").src = "https://discord.com/channels/@me");
 const isInStandaloneMode = () =>
     window.matchMedia("(display-mode: standalone)").matches ||
     window.matchMedia("(display-mode: fullscreen)").matches ||
+    window.matchMedia("(display-mode: window-controls-overlay)").matches ||
     window.navigator.standalone ||
     document.referrer.includes("android-app://");
 if (isInStandaloneMode()) {
@@ -196,20 +197,15 @@ if (isInStandaloneMode()) {
             deferredPrompt = null;
         });
 }
-window
-    .matchMedia("(display-mode: standalone)")
-    .addEventListener("change", (evt) => {
+[
+    window.matchMedia("(display-mode: standalone)"),
+    window.matchMedia("(display-mode: fullscreen)"),
+    window.matchMedia("(display-mode: window-controls-overlay)"),
+].some((x) => {
+    x.addEventListener("change", (evt) => {
         if (evt.matches) {
             loadDiscord();
         }
+        return false;
     });
-
-/* chrome 105 bugfix */
-function getChromeVersion() {
-    var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
-    return raw ? parseInt(raw[2], 10) : false;
-}
-if (getChromeVersion() >= 105) {
-    document.body.classList.add("chrome105bug");
-    loadDiscord();
-}
+});

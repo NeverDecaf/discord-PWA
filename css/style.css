@@ -81,7 +81,9 @@ html,
 }
 
 /* Display iframe only when opened as PWA */
-@media all and (display-mode: standalone), (display-mode: fullscreen) {
+@media all and (display-mode: standalone),
+  (display-mode: fullscreen),
+  (display-mode: window-controls-overlay) {
   #main {
     display: none;
   }
@@ -94,18 +96,4 @@ html,
   .modal.show {
     display: block;
   }
-}
-
-/* chrome 105 bugfix */
-.chrome105bug #main {
-  display: none;
-}
-.chrome105bug #frame {
-  display: block;
-}
-.chrome105bug .fullscreen {
-  background: #202225;
-}
-.chrome105bug .modal.show {
-  display: block;
 }
