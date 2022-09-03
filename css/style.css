@@ -28,10 +28,10 @@ html,
 }
 #main {
   z-index: 2;
-  color: #5865F2;
+  color: #5865f2;
 }
 #main .button {
-  background-color: #5865F2;
+  background-color: #5865f2;
   border-radius: 28px;
   font-size: 20px;
   padding: 16px 32px;
@@ -43,9 +43,10 @@ html,
   background-color: #8ea1e1;
   cursor: pointer;
 }
-#main h2, #main h4 {
-	padding-top: 20px;
-	padding-bottom: 20px;
+#main h2,
+#main h4 {
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 .modal {
   display: none; /* Hidden by default */
@@ -56,7 +57,7 @@ html,
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0, 0, 0, 0.4);
   text-align: center;
 }
 .modal-content {
@@ -80,7 +81,7 @@ html,
 }
 
 /* Display iframe only when opened as PWA */
-@media all and (display-mode: standalone),(display-mode: fullscreen) {
+@media all and (display-mode: standalone), (display-mode: fullscreen) {
   #main {
     display: none;
   }
@@ -91,6 +92,20 @@ html,
     background: #202225;
   }
   .modal.show {
-	display: block;
+    display: block;
   }
+}
+
+/* chrome 105 bugfix */
+.chrome105bug #main {
+  display: none;
+}
+.chrome105bug #frame {
+  display: block;
+}
+.chrome105bug .fullscreen {
+  background: #202225;
+}
+.chrome105bug .modal.show {
+  display: block;
 }

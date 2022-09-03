@@ -203,3 +203,13 @@ window
             loadDiscord();
         }
     });
+
+/* chrome 105 bugfix */
+function getChromeVersion() {
+    var raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+    return raw ? parseInt(raw[2], 10) : false;
+}
+if (getChromeVersion() >= 105) {
+    document.body.classList.add("chrome105bug");
+    loadDiscord();
+}
