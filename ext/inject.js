@@ -34,6 +34,17 @@ window.addEventListener("message", function (ev) {
                         document.documentElement
                     ).appendChild(script);
                     break;
+                case "init":
+                    !!ev.data?.payload?.wco_integration
+                        ? document.documentElement.setAttribute(
+                              "wco_integration",
+                              ""
+                          )
+                        : document.documentElement.removeAttribute(
+                              "wco_integration",
+                              ""
+                          );
+                    break;
             }
             break;
     }
@@ -47,6 +58,8 @@ const UsedModules = {
     UnreadGuildUtils: ["hasUnread", "getTotalMentionCount"],
     RelationshipStore: ["getFriendIDs", "getRelationships"],
     UserStore: ["getCurrentUser"],
+    // ItemLayerContainer: ["layer", "layerContainer"],
+    // Backdrop: ["backdrop", "withLayer"],
     // MessageStore: ["getAllReadStates"],
     // GuildChannelStore: ["getChannels", "getDefaultChannel"],
     // UnreadChannelUtils: ["getUnreadCount", "getOldestUnreadMessageId"],
@@ -128,6 +141,27 @@ Promise.allSettled(modulePromises)
                 "*"
             );
         }
+        function sendStyle() {
+            let rootstyle = getComputedStyle(document.documentElement);
+            window.postMessage(
+                {
+                    dest: "PWA",
+                    type: "style",
+                    payload: {
+                        titlebarColor: rootstyle.getPropertyValue(
+                            "--background-tertiary"
+                        ),
+                        backgroundColor: rootstyle.getPropertyValue(
+                            "--background-primary"
+                        ),
+                        leftSidebarWidth: getComputedStyle(
+                            document.querySelector('div[class|="scroller"]')
+                        ).getPropertyValue("width"),
+                    },
+                },
+                "*"
+            );
+        }
         UsedModules.Dispatcher.subscribe("RPC_NOTIFICATION_CREATE", () =>
             addUnread()
         );
@@ -135,6 +169,12 @@ Promise.allSettled(modulePromises)
         UsedModules.Dispatcher.subscribe("WINDOW_FOCUS", (e) => {
             if (!e.focused) addUnread();
         });
+        UsedModules.Dispatcher.subscribe(
+            "USER_SETTINGS_PROTO_UPDATE",
+            sendStyle
+        );
+        sendStyle();
+
         // UsedModules.Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // UsedModules.Dispatcher.subscribe('TRACK',()=>addUnread());
         function showConfirmationModal(title, content, options = {}) {

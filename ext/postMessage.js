@@ -1,7 +1,7 @@
 var default_options = {
     badge_count: "mentions",
     draw_attention_on: "messages",
-    wco_integration: false,
+    wco_integration: true,
 };
 
 function extMessage(data) {
@@ -62,10 +62,22 @@ chrome.storage.local.get(default_options, function (settings) {
                             },
                             "*"
                         );
+                        window.postMessage(
+                            {
+                                dest: "iframe",
+                                type: "init",
+                                payload: {
+                                    wco_integration: settings.wco_integration,
+                                },
+                            },
+                            "*"
+                        );
                         extMessage({
                             dest: "background",
                             type: "init",
-                            payload: settings.wco_integration,
+                            payload: {
+                                wco_integration: settings.wco_integration,
+                            },
                         });
                         break;
                 }

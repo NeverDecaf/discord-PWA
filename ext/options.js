@@ -4,10 +4,11 @@ function load_options() {
         draw_attention_on: "messages",
         custom_css: "",
         custom_js: "",
-        custom_title: "Discord",
+        custom_title: "",
+        enable_custom_theme: false,
         custom_theme: "#202225",
         relax_CSP_styles: false,
-        wco_integration: false,
+        wco_integration: true,
     };
     chrome.storage.local.get(default_options, function (items) {
         for (const [setting, value] of Object.entries(items)) {
@@ -41,6 +42,24 @@ function load_options() {
                         }
                     );
                 });
+            }
+        }
+        // 2nd loop to set sub keys
+        for (const [setting, value] of Object.entries(items)) {
+            const node = document.getElementById(setting);
+            if (node.parentElement.classList.contains("sub")) {
+                const cb =
+                    node.parentElement.previousElementSibling.querySelector(
+                        "input[type=checkbox]"
+                    );
+                if (cb) {
+                    const toggleDisabled = () => {
+                        node.toggleAttribute("disabled");
+                        node.parentElement.classList.toggle("disabled");
+                    };
+                    cb.addEventListener("change", toggleDisabled);
+                    if (!cb.checked) toggleDisabled();
+                }
             }
         }
     });

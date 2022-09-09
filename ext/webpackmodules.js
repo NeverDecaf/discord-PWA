@@ -513,4 +513,4 @@ export default class WebpackModules {
 WebpackModules.initialize();
 
 // uncomment and change js context to @me in order to access this in devtools.
-// window.wm = WebpackModules;
+window.wm = WebpackModules;

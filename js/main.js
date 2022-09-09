@@ -4,8 +4,12 @@ const extensionID = "edfpalahildnikdjdnmmoekoncglnblh";
 var modalCloseButton = document.getElementById("modalClose");
 var installedExtVersion;
 var extUpdateUrl;
+var update_wco = () => {};
 var wco_integration = false;
-
+const STORED_STYLES = {
+    backgroundColor: "#36393f",
+    titlebarColor: "#202225",
+};
 function version_is_newer(current, available) {
     let current_subvs = current.split(".");
     let available_subvs = available.split(".");
@@ -18,8 +22,7 @@ function version_is_newer(current, available) {
     }
     return false;
 }
-var theme_element = document.getElementById("theme-color");
-theme_element.setAttribute("old-theme", theme_element.getAttribute("content"));
+const theme_element = document.getElementById("theme-color");
 
 window.addEventListener("DOMContentLoaded", (event) => {
     var extNotLoaded;
@@ -41,6 +44,15 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     case "init":
                         clearTimeout(extNotLoaded);
                         wco_integration = !!e.data?.payload?.wco_integration;
+                        wco_integration
+                            ? document.documentElement.setAttribute(
+                                  "wco_integration",
+                                  ""
+                              )
+                            : document.documentElement.removeAttribute(
+                                  "wco_integration",
+                                  ""
+                              );
                         break;
                     case "badge":
                         navigator.setAppBadge(e.data.payload);
@@ -55,22 +67,23 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         // inject some WCO vars as CSS vars
                         if (
                             navigator.windowControlsOverlay &&
-                            navigator.windowControlsOverlay
-                                .getTitlebarAreaRect &&
-                            wco_integration
+                            navigator.windowControlsOverlay.getTitlebarAreaRect
                         ) {
-                            function update_wco(visible, titlebarAreaRect) {
-                                if (visible) {
+                            update_wco = (ev = undefined) => {
+                                let visible = ev
+                                        ? ev.visible
+                                        : navigator.windowControlsOverlay
+                                              .visible,
+                                    titlebarAreaRect = ev
+                                        ? ev.titlebarAreaRect
+                                        : navigator.windowControlsOverlay.getTitlebarAreaRect();
+                                if (!theme_element.hasAttribute("locked"))
                                     theme_element.setAttribute(
                                         "content",
-                                        "#36393f"
+                                        visible && wco_integration
+                                            ? STORED_STYLES["backgroundColor"]
+                                            : STORED_STYLES["titlebarColor"]
                                     );
-                                } else {
-                                    theme_element.setAttribute(
-                                        "content",
-                                        theme_element.getAttribute("old-theme")
-                                    );
-                                }
                                 e.source.postMessage(
                                     {
                                         dest: "iframe",
@@ -78,20 +91,24 @@ window.addEventListener("DOMContentLoaded", (event) => {
                                         payload:
                                             ":root{--titlebar-area-height: " +
                                             (titlebarAreaRect?.height ||
-                                                "'invalid'") +
+                                                "invalid") +
+                                            "; --titlebar-area-width: " +
+                                            (titlebarAreaRect?.width ||
+                                                "invalid") +
+                                            "; --wco-is-not-visible: " +
+                                            (visible ? 0 : 1) +
+                                            "; --wco-is-visible: " +
+                                            (visible ? 1 : 0) +
                                             ";}",
                                     },
                                     e.origin
                                 );
-                            }
-                            update_wco(
-                                navigator.windowControlsOverlay.visible,
-                                navigator.windowControlsOverlay.getTitlebarAreaRect()
-                            );
+                            };
+                            update_wco();
                             navigator.windowControlsOverlay.ongeometrychange = (
                                 ev
                             ) => {
-                                update_wco(ev.visible, ev.titlebarAreaRect);
+                                update_wco(ev);
                             };
                         }
                         // check for updates
@@ -151,6 +168,18 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     case "customTitle":
                         document.title = e.data.payload;
                         break;
+                    case "style":
+                        for (const [k, v] of Object.entries(e.data.payload)) {
+                            STORED_STYLES[k] = v;
+                        }
+                        if (wco_integration && STORED_STYLES.leftSidebarWidth) {
+                            document.documentElement.style.setProperty(
+                                "--left-sidebar-width",
+                                STORED_STYLES.leftSidebarWidth
+                            );
+                        }
+                        update_wco();
+                        break;
                 }
                 break;
         }
@@ -177,6 +206,7 @@ const isInStandaloneMode = () =>
     window.matchMedia("(display-mode: standalone)").matches ||
     window.matchMedia("(display-mode: fullscreen)").matches ||
     window.matchMedia("(display-mode: window-controls-overlay)").matches ||
+    window.matchMedia("(display-mode: borderless)").matches ||
     window.navigator.standalone ||
     document.referrer.includes("android-app://");
 if (isInStandaloneMode()) {
@@ -201,6 +231,7 @@ if (isInStandaloneMode()) {
     window.matchMedia("(display-mode: standalone)"),
     window.matchMedia("(display-mode: fullscreen)"),
     window.matchMedia("(display-mode: window-controls-overlay)"),
+    window.matchMedia("(display-mode: borderless)"),
 ].some((x) => {
     x.addEventListener("change", (evt) => {
         if (evt.matches) {

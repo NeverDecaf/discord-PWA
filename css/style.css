@@ -1,3 +1,8 @@
+:root {
+  /*--titlebar-height: env(titlebar-area-height, 0);*/
+  --titlebar-height: 0;
+  --left-sidebar-width: 0;
+}
 body {
   font-family: sans-serif;
   background: #202225;
@@ -83,7 +88,8 @@ html,
 /* Display iframe only when opened as PWA */
 @media all and (display-mode: standalone),
   (display-mode: fullscreen),
-  (display-mode: window-controls-overlay) {
+  (display-mode: window-controls-overlay),
+  (display-mode: borderless) {
   #main {
     display: none;
   }
@@ -97,3 +103,130 @@ html,
     display: block;
   }
 }
+
+/* wco drag region */
+html[wco_integration] body:before {
+  content: "";
+  width: var(--left-sidebar-width);
+  height: env(titlebar-area-height, 0);
+  background: #0000;
+  z-index: 1;
+  position: fixed;
+  -webkit-app-region: drag;
+  app-region: drag;
+}
+
+/* title bar styles - unused currently, will be used once borderless mode is supported. */
+#frame:not(.cros):not(.android) {
+  top: var(--titlebar-height);
+  height: calc(100vh - var(--titlebar-height));
+  position: relative;
+  user-select: none;
+}
+.titleBar {
+  display: inherit;
+  width: 100%;
+  height: var(--titlebar-height);
+  position: absolute;
+  background: #00000000;
+
+  flex-shrink: 0;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  flex-direction: row-reverse;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  display: flex;
+
+  padding-top: 4px;
+  opacity: 1;
+
+  -moz-transition: background 0.2s ease-in;
+  -o-transition: background 0.2s ease-in;
+  -webkit-transition: background 0.2s ease-in;
+  transition: background 0.2s ease-in;
+}
+
+#backdrop {
+  width: 100%;
+  height: var(--titlebar-height);
+  position: absolute;
+  background: #000000;
+  z-index: -1;
+  opacity: 0;
+  -webkit-app-region: drag;
+}
+
+#barbackground {
+  width: 100%;
+  height: var(--titlebar-height);
+  position: absolute;
+  background: #202225; /* should set this to same color as theme (user set) */
+  z-index: -2;
+}
+
+.wordmark {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 1;
+  padding: 4px 9px 3px 9px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.buttonClose,
+.buttonMin,
+.buttonMax {
+  display: flex;
+
+  position: relative;
+  top: -4px;
+  width: 28px;
+  height: var(
+    --titlebar-height
+  ); /* these buttons will look awful, but WCO covers them */
+  cursor: pointer;
+  opacity: 0.6;
+  -webkit-app-region: no-drag;
+  -webkit-box-direction: reverse;
+  -webkit-box-align: center;
+
+  display: flex;
+
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  justify-content: center;
+
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  vertical-align: baseline;
+
+  line-height: 16px;
+  pointer-events: auto;
+  user-select: none;
+}
+.buttonClose:hover {
+  background-color: #f04747;
+  opacity: 1;
+}
+.buttonMin:hover,
+.buttonMax:hover {
+  background-color: rgba(79, 84, 92, 0.16);
+  opacity: 1;
+}
+
+.titleBar,
+#backdrop,
+#barbackground {
+  display: none !important;
+}
+/* end title bar styles */
