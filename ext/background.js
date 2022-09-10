@@ -73,7 +73,7 @@ createCSPRule();
 const default_options = {
     custom_css: "",
     custom_js: "",
-    custom_title: "Discord",
+    custom_title: "",
     relax_CSP_styles: false,
 };
 var lastDrawAttention = Date.now();
