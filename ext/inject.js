@@ -54,10 +54,22 @@ window.addEventListener("message", function (ev) {
 // some (Dispatcher) from here: https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/discordmodules.js
 const UsedModules = {
     // Dispatcher: ["dirtyDispatch"],
-    Dispatcher: ["dispatch", "subscribe"],
-    UnreadGuildUtils: ["hasUnread", "getTotalMentionCount"],
-    RelationshipStore: ["getFriendIDs", "getRelationships"],
-    UserStore: ["getCurrentUser"],
+    Dispatcher: Filters.byProps(["dispatch", "subscribe"]),
+    UnreadGuildUtils: Filters.byProps(["hasUnread", "getTotalMentionCount"]),
+    RelationshipStore: Filters.byProps(["getFriendIDs", "getRelationships"]),
+    UserStore: Filters.byProps(["getCurrentUser"]),
+    // ModalActions: Filters.byProps(["updateModal", "openModal"]),
+    // Markdown: Filters.byDisplayName("Markdown"),
+    // ConfirmationModal: Filters.byDisplayName("ConfirmModal"),
+    // React: Filters.byProps([
+    //     "Component",
+    //     "PureComponent",
+    //     "Children",
+    //     "createElement",
+    //     "cloneElement",
+    // ]),
+    // Buttons: Filters.byProps(["ButtonSizes"]),
+
     // ItemLayerContainer: ["layer", "layerContainer"],
     // Backdrop: ["backdrop", "withLayer"],
     // MessageStore: ["getAllReadStates"],
@@ -76,7 +88,7 @@ const UsedModules = {
 const modulePromises = [];
 // use getLazy for all modules in case some are not immediately loaded
 for (const [key, value] of Object.entries(UsedModules)) {
-    const p = WebpackModules.getLazy(Filters.byProps(value));
+    const p = WebpackModules.getLazy(value);
     modulePromises.push(p);
     p.then((mod) => (UsedModules[key] = mod));
 }
@@ -178,20 +190,9 @@ Promise.allSettled(modulePromises)
         // UsedModules.Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
         // UsedModules.Dispatcher.subscribe('TRACK',()=>addUnread());
         function showConfirmationModal(title, content, options = {}) {
-            const ModalActions = WebpackModules.findByUniqueProperties([
-                "openModal",
-                "updateModal",
-            ]);
-            const Markdown = WebpackModules.findByDisplayName("Markdown");
-            const ConfirmationModal =
-                WebpackModules.findByDisplayName("ConfirmModal");
-            const React = WebpackModules.findByUniqueProperties([
-                "Component",
-                "PureComponent",
-                "Children",
-                "createElement",
-                "cloneElement",
-            ]);
+            const Markdown = UsedModules.Markdown;
+            const ConfirmationModal = UsedModules.ConfirmationModal;
+            const ModalActions = UsedModules.ModalActions;
             if (!ModalActions || !ConfirmationModal || !Markdown)
                 return alert(content);
 
@@ -208,17 +209,20 @@ Promise.allSettled(modulePromises)
             if (!Array.isArray(content)) content = [content];
             content = content.map((c) =>
                 typeof c === "string"
-                    ? React.createElement(Markdown, null, c)
+                    ? UsedModules.React.createElement(Markdown, null, c)
                     : c
             );
+
             return ModalActions.openModal(
                 (props) => {
-                    return React.createElement(
+                    return UsedModules.React.createElement(
                         ConfirmationModal,
                         Object.assign(
                             {
                                 header: title,
-                                red: danger,
+                                confirmButtonColor: danger
+                                    ? UsedModules.Buttons.ButtonColors.RED
+                                    : UsedModules.Buttons.ButtonColors.BRAND,
                                 confirmText: confirmText,
                                 cancelText: cancelText,
                                 onConfirm: onConfirm,
@@ -229,10 +233,12 @@ Promise.allSettled(modulePromises)
                         content
                     );
                 },
-                {
-                    modalKey: key,
-                }
+                { modalKey: key }
             );
+        }
+
+        function showConfirmationModal(title, content, options = {}) {
+            alert(content);
         }
 
         updateModal = function (url) {
