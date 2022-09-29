@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Discord PWA Helper",
-    "version": "1.6.0.2",
+    "version": "1.6.1",
 
     "description": "Deletes X-Frame-Options response header for discord.com. Also injects some Javascript to enable notifications.",
     "icons": {
@@ -58,7 +58,12 @@
 
     "web_accessible_resources": [
         {
-            "resources": ["manifest.json", "inject.js", "webpackmodules.js"],
+            "resources": [
+                "manifest.json",
+                "inject.js",
+                "renderer/src/modules/webpackmodules.js",
+                "common/logger.js"
+            ],
             "matches": [
                 "https://discord.com/*",
                 "https://neverdecaf.github.io/*"

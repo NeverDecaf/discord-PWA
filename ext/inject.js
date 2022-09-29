@@ -1,6 +1,8 @@
 var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
-import WebpackModules, { Filters } from "./webpackmodules.js";
+import WebpackModules, {
+    Filters,
+} from "./renderer/src/modules/webpackmodules.js";
 
 function updateModal(url) {
     setTimeout(() => updateModal(url), 1000);
@@ -54,10 +56,16 @@ window.addEventListener("message", function (ev) {
 // some (Dispatcher) from here: https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/discordmodules.js
 const UsedModules = {
     // Dispatcher: ["dirtyDispatch"],
-    Dispatcher: Filters.byProps(["dispatch", "subscribe"]),
-    UnreadGuildUtils: Filters.byProps(["hasUnread", "getTotalMentionCount"]),
-    RelationshipStore: Filters.byProps(["getFriendIDs", "getRelationships"]),
-    UserStore: Filters.byProps(["getCurrentUser"]),
+    Dispatcher: Filters.byProps(["dispatch", "subscribe", "register"]),
+    GuildReadStateStore: Filters.byProps(["hasUnread", "getTotalMentionCount"]), // in BDFDB this is found by: WebpackModules.getModule(m => m && typeof m.getName == "function" && m.getName() == 'GuildReadStateStore' && m)
+    // This is how it's found in DBFBD:
+    // GuildReadStateStore: (m) =>
+    //     m &&
+    //     typeof m.getName == "function" &&
+    //     m.getName() == "GuildReadStateStore" &&
+    //     m,
+    RelationshipStore: Filters.byProps(["isBlocked", "getFriendIDs"]),
+    UserStore: Filters.byProps(["getCurrentUser", "getUser"]),
     // ModalActions: Filters.byProps(["updateModal", "openModal"]),
     // Markdown: Filters.byDisplayName("Markdown"),
     // ConfirmationModal: Filters.byDisplayName("ConfirmModal"),
@@ -124,11 +132,12 @@ Promise.allSettled(modulePromises)
         );
 
         function addUnread() {
-            var unreadMessages = UsedModules.UnreadGuildUtils.hasAnyUnread(),
+            var unreadMessages = UsedModules.GuildReadStateStore.hasAnyUnread(),
                 unreadChannels =
-                    UsedModules.UnreadGuildUtils.getMutableUnreadGuilds().size,
+                    UsedModules.GuildReadStateStore.getMutableUnreadGuilds()
+                        .size,
                 unreadMentions =
-                    UsedModules.UnreadGuildUtils.getTotalMentionCount() +
+                    UsedModules.GuildReadStateStore.getTotalMentionCount() +
                     UsedModules.RelationshipStore.getPendingCount();
             const data = {
                 messages: unreadMessages,
@@ -155,6 +164,13 @@ Promise.allSettled(modulePromises)
         }
         function sendStyle() {
             let rootstyle = getComputedStyle(document.documentElement);
+            let serverBar = document.querySelector('div[class|="scroller"]');
+            if (!serverBar) {
+                console.error(
+                    "Failed to get sidebar style, WCO integration may fail."
+                );
+                return;
+            }
             window.postMessage(
                 {
                     dest: "PWA",
@@ -166,9 +182,10 @@ Promise.allSettled(modulePromises)
                         backgroundColor: rootstyle.getPropertyValue(
                             "--background-primary"
                         ),
-                        leftSidebarWidth: getComputedStyle(
-                            document.querySelector('div[class|="scroller"]')
-                        ).getPropertyValue("width"),
+                        leftSidebarWidth:
+                            getComputedStyle(serverBar).getPropertyValue(
+                                "width"
+                            ),
                     },
                 },
                 "*"
