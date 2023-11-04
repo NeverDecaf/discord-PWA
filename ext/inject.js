@@ -40,11 +40,11 @@ window.addEventListener("message", function (ev) {
                     !!ev.data?.payload?.wco_integration
                         ? document.documentElement.setAttribute(
                               "wco_integration",
-                              ""
+                              "",
                           )
                         : document.documentElement.removeAttribute(
                               "wco_integration",
-                              ""
+                              "",
                           );
                     break;
             }
@@ -56,27 +56,27 @@ window.addEventListener("message", function (ev) {
 // some (Dispatcher) from here: https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/discordmodules.js
 const UsedModules = {
     // Dispatcher: ["dirtyDispatch"],
-    Dispatcher: Filters.byProps(["dispatch", "subscribe", "register"]),
-    GuildReadStateStore: Filters.byProps(["hasUnread", "getTotalMentionCount"]), // in BDFDB this is found by: WebpackModules.getModule(m => m && typeof m.getName == "function" && m.getName() == 'GuildReadStateStore' && m)
+    Dispatcher: Filters.byKeys(["dispatch", "subscribe", "register"]),
+    GuildReadStateStore: Filters.byKeys(["hasUnread", "getTotalMentionCount"]), // in BDFDB this is found by: WebpackModules.getModule(m => m && typeof m.getName == "function" && m.getName() == 'GuildReadStateStore' && m)
     // This is how it's found in DBFBD:
     // GuildReadStateStore: (m) =>
     //     m &&
     //     typeof m.getName == "function" &&
     //     m.getName() == "GuildReadStateStore" &&
     //     m,
-    RelationshipStore: Filters.byProps(["isBlocked", "getFriendIDs"]),
-    UserStore: Filters.byProps(["getCurrentUser", "getUser"]),
-    // ModalActions: Filters.byProps(["updateModal", "openModal"]),
+    RelationshipStore: Filters.byKeys(["isBlocked", "getFriendIDs"]),
+    UserStore: Filters.byKeys(["getCurrentUser", "getUser"]),
+    // ModalActions: Filters.byKeys(["updateModal", "openModal"]),
     // Markdown: Filters.byDisplayName("Markdown"),
     // ConfirmationModal: Filters.byDisplayName("ConfirmModal"),
-    // React: Filters.byProps([
+    // React: Filters.byKeys([
     //     "Component",
     //     "PureComponent",
     //     "Children",
     //     "createElement",
     //     "cloneElement",
     // ]),
-    // Buttons: Filters.byProps(["ButtonSizes"]),
+    // Buttons: Filters.byKeys(["ButtonSizes"]),
 
     // ItemLayerContainer: ["layer", "layerContainer"],
     // Backdrop: ["backdrop", "withLayer"],
@@ -106,7 +106,7 @@ Promise.allSettled(modulePromises)
             new Promise((done) => {
                 if (UsedModules.UserStore.getCurrentUser()) return done();
                 UsedModules.Dispatcher.subscribe("CONNECTION_OPEN", done);
-            })
+            }),
     )
     .then(() => {
         window.postMessage(
@@ -114,21 +114,21 @@ Promise.allSettled(modulePromises)
                 dest: "PWA",
                 type: "discordLoaded",
             },
-            "*"
+            "*",
         );
         window.postMessage(
             {
                 dest: "background",
                 type: "discordLoaded",
             },
-            "*"
+            "*",
         );
         window.postMessage(
             {
                 dest: "content",
                 type: "discordLoaded",
             },
-            "*"
+            "*",
         );
 
         function addUnread() {
@@ -151,7 +151,7 @@ Promise.allSettled(modulePromises)
                     type: "badge",
                     payload: data[BADGE_COUNT],
                 },
-                "*"
+                "*",
             );
             window.postMessage(
                 {
@@ -159,15 +159,15 @@ Promise.allSettled(modulePromises)
                     type: "drawAttention",
                     payload: data[DRAWATTENTION_COUNT] || data[BADGE_COUNT],
                 },
-                "*"
+                "*",
             );
         }
         function sendStyle() {
             let rootstyle = getComputedStyle(document.documentElement);
-            let serverBar = document.querySelector('div[class|="scroller"]');
+            let serverBar = document.querySelector('div[class*="scroller_"]');
             if (!serverBar) {
                 console.error(
-                    "Failed to get sidebar style, WCO integration may fail."
+                    "Failed to get sidebar style, WCO integration may fail.",
                 );
                 return;
             }
@@ -177,22 +177,22 @@ Promise.allSettled(modulePromises)
                     type: "style",
                     payload: {
                         titlebarColor: rootstyle.getPropertyValue(
-                            "--background-tertiary"
+                            "--background-tertiary",
                         ),
                         backgroundColor: rootstyle.getPropertyValue(
-                            "--background-primary"
+                            "--background-primary",
                         ),
                         leftSidebarWidth:
                             getComputedStyle(serverBar).getPropertyValue(
-                                "width"
+                                "width",
                             ),
                     },
                 },
-                "*"
+                "*",
             );
         }
         UsedModules.Dispatcher.subscribe("RPC_NOTIFICATION_CREATE", () =>
-            addUnread()
+            addUnread(),
         );
         UsedModules.Dispatcher.subscribe("MESSAGE_ACK", () => addUnread());
         UsedModules.Dispatcher.subscribe("WINDOW_FOCUS", (e) => {
@@ -200,7 +200,7 @@ Promise.allSettled(modulePromises)
         });
         UsedModules.Dispatcher.subscribe(
             "USER_SETTINGS_PROTO_UPDATE",
-            sendStyle
+            sendStyle,
         );
         sendStyle();
 
@@ -227,7 +227,7 @@ Promise.allSettled(modulePromises)
             content = content.map((c) =>
                 typeof c === "string"
                     ? UsedModules.React.createElement(Markdown, null, c)
-                    : c
+                    : c,
             );
 
             return ModalActions.openModal(
@@ -245,12 +245,12 @@ Promise.allSettled(modulePromises)
                                 onConfirm: onConfirm,
                                 onCancel: onCancel,
                             },
-                            props
+                            props,
                         ),
-                        content
+                        content,
                     );
                 },
-                { modalKey: key }
+                { modalKey: key },
             );
         }
 
@@ -268,7 +268,7 @@ Promise.allSettled(modulePromises)
                     onConfirm: () => {
                         window.open(url, "_blank");
                     },
-                }
+                },
             );
         };
     });

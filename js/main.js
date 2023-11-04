@@ -47,11 +47,11 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         wco_integration
                             ? document.documentElement.setAttribute(
                                   "wco_integration",
-                                  ""
+                                  "",
                               )
                             : document.documentElement.removeAttribute(
                                   "wco_integration",
-                                  ""
+                                  "",
                               );
                         break;
                     case "badge":
@@ -60,7 +60,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                     case "refresh":
                         setTimeout(
                             () => (document.getElementById("frame").src += ""),
-                            1000
+                            1000,
                         );
                         break;
                     case "discordLoaded":
@@ -82,7 +82,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                                         "content",
                                         visible && wco_integration
                                             ? STORED_STYLES["backgroundColor"]
-                                            : STORED_STYLES["titlebarColor"]
+                                            : STORED_STYLES["titlebarColor"],
                                     );
                                 e.source.postMessage(
                                     {
@@ -101,12 +101,12 @@ window.addEventListener("DOMContentLoaded", (event) => {
                                             (visible ? 1 : 0) +
                                             ";}",
                                     },
-                                    e.origin
+                                    e.origin,
                                 );
                             };
                             update_wco();
                             navigator.windowControlsOverlay.ongeometrychange = (
-                                ev
+                                ev,
                             ) => {
                                 update_wco(ev);
                             };
@@ -117,8 +117,8 @@ window.addEventListener("DOMContentLoaded", (event) => {
                             .then((str) =>
                                 new window.DOMParser().parseFromString(
                                     str,
-                                    "text/xml"
-                                )
+                                    "text/xml",
+                                ),
                             )
                             .then((data) => {
                                 if (
@@ -126,9 +126,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
                                         installedExtVersion,
                                         data
                                             .getElementsByTagName(
-                                                "updatecheck"
+                                                "updatecheck",
                                             )[0]
-                                            .getAttribute("version")
+                                            .getAttribute("version"),
                                     )
                                 ) {
                                     e.source.postMessage(
@@ -137,17 +137,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
                                             type: "updateAvailable",
                                             payload: data
                                                 .getElementsByTagName(
-                                                    "updatecheck"
+                                                    "updatecheck",
                                                 )[0]
                                                 .getAttribute("codebase"),
                                         },
-                                        e.origin
+                                        e.origin,
                                     );
                                 }
                             })
                             .catch((err) => {
                                 console.error(
-                                    "Error checking for Discord PWA extension updates."
+                                    "Error checking for Discord PWA extension updates.",
                                 );
                             });
                         break;
@@ -160,9 +160,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
                                         type: "clientcss",
                                         payload: txt,
                                     },
-                                    e.origin
+                                    e.origin,
                                 );
-                            })
+                            }),
                         );
                         break;
                     case "customTitle":
@@ -175,7 +175,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
                         if (wco_integration && STORED_STYLES.leftSidebarWidth) {
                             document.documentElement.style.setProperty(
                                 "--left-sidebar-width",
-                                STORED_STYLES.leftSidebarWidth
+                                STORED_STYLES.leftSidebarWidth,
                             );
                         }
                         update_wco();
