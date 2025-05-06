@@ -93,21 +93,29 @@ const UsedModules = {
     // FolderStore: ["getFlattenedGuilds"],
     // AltChannelStore: ["getChannels", "getDefaultChannel"],
 };
-const modulePromises = [];
-// use getLazy for all modules in case some are not immediately loaded
-for (const [key, value] of Object.entries(UsedModules)) {
-    const p = WebpackModules.getLazy(value);
-    modulePromises.push(p);
-    p.then((mod) => (UsedModules[key] = mod));
-}
-Promise.allSettled(modulePromises)
+// load dispatcher first and wait for CONNECTION_OPEN, but also check for getCurrentUser() in case CONNECTION_OPEN already happened.
+WebpackModules.getLazy(UsedModules.Dispatcher)
     .then(
-        () =>
+        (dispatcher) =>
             new Promise((done) => {
-                if (UsedModules.UserStore.getCurrentUser()) return done();
-                UsedModules.Dispatcher.subscribe("CONNECTION_OPEN", done);
+                WebpackModules.getLazy(UsedModules.UserStore).then(
+                    (userStore) => {
+                        if (userStore.getCurrentUser()) done();
+                    },
+                );
+                dispatcher.subscribe("CONNECTION_OPEN", done);
             }),
     )
+    .then(() => {
+        const modulePromises = [];
+        // use getLazy for all modules in case some are not immediately loaded
+        for (const [key, value] of Object.entries(UsedModules)) {
+            const p = WebpackModules.getLazy(value);
+            modulePromises.push(p);
+            p.then((mod) => (UsedModules[key] = mod));
+        }
+        return Promise.allSettled(modulePromises);
+    })
     .then(() => {
         window.postMessage(
             {

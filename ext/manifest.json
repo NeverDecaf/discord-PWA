@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Discord PWA Helper",
-    "version": "1.6.1.2",
+    "version": "1.6.1.3",
 
     "description": "Deletes X-Frame-Options response header for discord.com. Also injects some Javascript to enable notifications.",
     "icons": {
