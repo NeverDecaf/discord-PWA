@@ -107,7 +107,7 @@ html,
 /* wco drag region */
 html[wco_integration] body:before {
   content: "";
-  width: var(--left-sidebar-width);
+  width: 100%;
   height: env(titlebar-area-height, 0);
   background: #0000;
   z-index: 1;
