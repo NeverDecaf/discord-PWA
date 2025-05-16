@@ -93,12 +93,34 @@ const UsedModules = {
     // FolderStore: ["getFlattenedGuilds"],
     // AltChannelStore: ["getChannels", "getDefaultChannel"],
 };
+async function retryGetLazyUntilResolved(filter, maxAttempts = 100) {
+    // chatGPT function
+    for (let attempts = 0; attempts < maxAttempts; attempts++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 1000);
+
+        try {
+            const result = await WebpackModules.getLazy(filter, {
+                signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            if (result) return result; // resolved successfully, exit loop & return
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (err.name !== "AbortError") {
+                // Some error other than abort - rethrow or handle as you want
+                throw err;
+            }
+            // else it was aborted, so retry automatically by looping
+        }
+    }
+}
 // load dispatcher first and wait for CONNECTION_OPEN, but also check for getCurrentUser() in case CONNECTION_OPEN already happened.
-WebpackModules.getLazy(UsedModules.Dispatcher)
+retryGetLazyUntilResolved(UsedModules.Dispatcher)
     .then(
         (dispatcher) =>
             new Promise((done) => {
-                WebpackModules.getLazy(UsedModules.UserStore).then(
+                retryGetLazyUntilResolved(UsedModules.UserStore).then(
                     (userStore) => {
                         if (userStore.getCurrentUser()) done();
                     },
@@ -108,9 +130,8 @@ WebpackModules.getLazy(UsedModules.Dispatcher)
     )
     .then(() => {
         const modulePromises = [];
-        // use getLazy for all modules in case some are not immediately loaded
         for (const [key, value] of Object.entries(UsedModules)) {
-            const p = WebpackModules.getLazy(value);
+            const p = retryGetLazyUntilResolved(value);
             modulePromises.push(p);
             p.then((mod) => (UsedModules[key] = mod));
         }
