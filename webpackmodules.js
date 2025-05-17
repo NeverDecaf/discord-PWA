@@ -4,7 +4,7 @@
  * @module WebpackModules
  * @version 0.0.2
  * from https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/webpackmodules.js
- * Logger import replaced with dummy class
+ * Logger import replaced with dummy class; Filters and WebpackModules exposed via window.
  */
 class Logger {
   static warn(...args) {
@@ -673,3 +673,5 @@ export default class WebpackModules {
 }
 
 WebpackModules.initialize();
+window.WebpackModules = WebpackModules;
+window.Filters = Filters;
