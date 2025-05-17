@@ -2,7 +2,7 @@ var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
 import WebpackModules, {
     Filters,
-} from "./renderer/src/modules/webpackmodules.js";
+} from "./webpackmodules.js";
 
 function updateModal(url) {
     setTimeout(() => updateModal(url), 1000);
