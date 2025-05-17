@@ -1,8 +1,5 @@
 var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
-import WebpackModules, {
-    Filters,
-} from "./renderer/src/modules/webpackmodules.js";
 
 function updateModal(url) {
     setTimeout(() => updateModal(url), 1000);
@@ -56,16 +53,19 @@ window.addEventListener("message", function (ev) {
 // some (Dispatcher) from here: https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/discordmodules.js
 const UsedModules = {
     // Dispatcher: ["dirtyDispatch"],
-    Dispatcher: Filters.byKeys(["dispatch", "subscribe", "register"]),
-    GuildReadStateStore: Filters.byKeys(["hasUnread", "getTotalMentionCount"]), // in BDFDB this is found by: WebpackModules.getModule(m => m && typeof m.getName == "function" && m.getName() == 'GuildReadStateStore' && m)
+    Dispatcher: window.Filters.byKeys(["dispatch", "subscribe", "register"]),
+    GuildReadStateStore: window.Filters.byKeys([
+        "hasUnread",
+        "getTotalMentionCount",
+    ]), // in BDFDB this is found by: WebpackModules.getModule(m => m && typeof m.getName == "function" && m.getName() == 'GuildReadStateStore' && m)
     // This is how it's found in DBFBD:
     // GuildReadStateStore: (m) =>
     //     m &&
     //     typeof m.getName == "function" &&
     //     m.getName() == "GuildReadStateStore" &&
     //     m,
-    RelationshipStore: Filters.byKeys(["isBlocked", "getFriendIDs"]),
-    UserStore: Filters.byKeys(["getCurrentUser", "getUser"]),
+    RelationshipStore: window.Filters.byKeys(["isBlocked", "getFriendIDs"]),
+    UserStore: window.Filters.byKeys(["getCurrentUser", "getUser"]),
     // ModalActions: Filters.byKeys(["updateModal", "openModal"]),
     // Markdown: Filters.byDisplayName("Markdown"),
     // ConfirmationModal: Filters.byDisplayName("ConfirmModal"),
@@ -100,7 +100,7 @@ async function retryGetLazyUntilResolved(filter, maxAttempts = 100) {
         const timeoutId = setTimeout(() => controller.abort(), 1000);
 
         try {
-            const result = await WebpackModules.getLazy(filter, {
+            const result = await window.WebpackModules.getLazy(filter, {
                 signal: controller.signal,
             });
             clearTimeout(timeoutId);

@@ -14,7 +14,7 @@ function extMessage(data) {
                     dest: "PWA",
                     type: "refresh",
                 },
-                "*"
+                "*",
             );
     }
 }
@@ -25,16 +25,23 @@ chrome.storage.local.get(default_options, function (settings) {
             type: "init",
             payload: settings,
         },
-        "*"
+        "*",
     );
-    const script = document.createElement("script");
-    script.setAttribute("type", "module");
-    script.setAttribute("src", chrome.runtime.getURL("inject.js"));
     const head =
         document.head ||
         document.getElementsByTagName("head")[0] ||
         document.documentElement;
-    head.insertBefore(script, head.lastChild);
+    const wm = document.createElement("script");
+    wm.setAttribute("type", "module");
+    // must load webpackmodules first as it's used by inject.js
+    wm.src = "https://neverdecaf.github.io/discord-PWA/webpackmodules.js";
+    wm.onload = () => {
+        const script = document.createElement("script");
+        script.setAttribute("type", "module");
+        script.setAttribute("src", chrome.runtime.getURL("inject.js"));
+        head.insertBefore(script, head.lastChild);
+    };
+    head.insertBefore(wm, head.lastChild);
     var relayMsg = function (event) {
         switch (event.data.dest) {
             case "background":
@@ -52,7 +59,7 @@ chrome.storage.local.get(default_options, function (settings) {
                                 type: "badgeCount",
                                 payload: settings.badge_count,
                             },
-                            "*"
+                            "*",
                         );
                         window.postMessage(
                             {
@@ -60,7 +67,7 @@ chrome.storage.local.get(default_options, function (settings) {
                                 type: "drawAttentionCount",
                                 payload: settings.draw_attention_on,
                             },
-                            "*"
+                            "*",
                         );
                         window.postMessage(
                             {
@@ -70,7 +77,7 @@ chrome.storage.local.get(default_options, function (settings) {
                                     wco_integration: settings.wco_integration,
                                 },
                             },
-                            "*"
+                            "*",
                         );
                         extMessage({
                             dest: "background",
@@ -88,7 +95,7 @@ chrome.storage.local.get(default_options, function (settings) {
     chrome.runtime.onMessage.addListener(function (
         request,
         sender,
-        sendResponse
+        sendResponse,
     ) {
         switch (request.dest) {
             case "PWA":

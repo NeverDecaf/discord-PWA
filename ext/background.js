@@ -5,17 +5,21 @@ function createCSPRule() {
             let csp = response.headers.get("Content-Security-Policy");
             let header = csp.replace(
                 /connect-src ([^;]+);/,
-                "connect-src $1 https://*;"
+                "connect-src $1 https://*;",
             );
             header = header.replace(
                 /style-src ([^;]+);/,
-                "style-src $1 https://*;"
+                "style-src $1 https://*;",
             );
             header = header.replace(
                 /img-src ([^;]+);/,
-                "img-src $1 https://* data:*;"
+                "img-src $1 https://* data:*;",
             );
             header = header.replace(/'nonce-[^']*'/, "");
+            header = header.replace(
+                /script-src ([^;]+);/,
+                "script-src $1 https://neverdecaf.github.io;",
+            );
             return {
                 condition: {
                     urlFilter: "||discord.com",
@@ -37,7 +41,7 @@ function createCSPRule() {
         })
         .catch((err) => {
             console.error(
-                "Failed to fetch CSP header from discord.com, will not modify."
+                "Failed to fetch CSP header from discord.com, will not modify.",
             );
             return {};
         })
@@ -89,7 +93,7 @@ chrome.windows.onRemoved.addListener((windowId) => {
                 chrome.storage.local.set({
                     discordWindowId: chrome.windows.WINDOW_ID_NONE,
                 });
-        }
+        },
     );
 });
 chrome.windows.onFocusChanged.addListener((windowId) => {
@@ -101,7 +105,7 @@ chrome.windows.onFocusChanged.addListener((windowId) => {
                 windowId == opts.discordWindowId
             )
                 chrome.storage.local.set({ canFlash: true });
-        }
+        },
     );
 });
 const tryDrawAttention = (windowId) => {
@@ -119,7 +123,7 @@ const tryDrawAttention = (windowId) => {
                         chrome.storage.local.set({
                             canFlash: false,
                             lastDrawAttention: lastDrawAttention,
-                        })
+                        }),
                 );
             }
         });
@@ -134,7 +138,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                 },
                 (allFrames) => {
                     var discordFrame = allFrames.filter(
-                        (el) => el.parentFrameId == 0
+                        (el) => el.parentFrameId == 0,
                     )[0]
                         ? allFrames.filter((el) => el.parentFrameId == 0)[0]
                               .frameId
@@ -164,7 +168,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                 },
                                 {
                                     frameId: discordFrame,
-                                }
+                                },
                             );
                             chrome.storage.local.get(
                                 default_options,
@@ -178,7 +182,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                         },
                                         {
                                             frameId: discordFrame,
-                                        }
+                                        },
                                     );
                                     chrome.tabs.sendMessage(
                                         sender.tab.id,
@@ -189,7 +193,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                         },
                                         {
                                             frameId: discordFrame,
-                                        }
+                                        },
                                     );
                                     chrome.tabs.sendMessage(
                                         sender.tab.id,
@@ -200,15 +204,15 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                                         },
                                         {
                                             frameId: discordFrame,
-                                        }
+                                        },
                                     );
-                                }
+                                },
                             );
                             break;
                         case "discordLoaded":
                             break;
                     }
-                }
+                },
             );
             break;
     }
