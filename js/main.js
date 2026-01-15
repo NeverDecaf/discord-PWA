@@ -1,4 +1,4 @@
-const discordHome = "https://discord.com/channels/@me";
+const discordHome = "https://canary.discord.com/channels/@me";
 const modal = document.getElementById("extWarning");
 const extensionID = "edfpalahildnikdjdnmmoekoncglnblh";
 var modalCloseButton = document.getElementById("modalClose");
@@ -201,7 +201,7 @@ modalCloseButton.onclick = function () {
 // PWA Install page stuff
 const loadDiscord = () =>
     document.getElementById("frame").src.match(/discord\.com/) ||
-    (document.getElementById("frame").src = "https://discord.com/channels/@me");
+    (document.getElementById("frame").src = "https://canary.discord.com/channels/@me");
 const isInStandaloneMode = () =>
     window.matchMedia("(display-mode: standalone)").matches ||
     window.matchMedia("(display-mode: fullscreen)").matches ||
