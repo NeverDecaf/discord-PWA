@@ -17,13 +17,13 @@
 
     "content_scripts": [
         {
-            "matches": ["https://discord.com/*"],
+            "matches": ["https://*.discord.com/*"],
             "js": ["postMessage.js"],
             "all_frames": true,
             "run_at": "document_end"
         },
         {
-            "matches": ["https://neverdecaf.github.io/discord-PWA/*"],
+            "matches": ["https://yerdzxc.github.io/discord-PWA/*"],
             "js": ["customTheme.js"],
             "all_frames": false,
             "run_at": "document_end"
@@ -47,8 +47,8 @@
         "scripting"
     ],
     "host_permissions": [
-        "https://discord.com/*",
-        "https://neverdecaf.github.io/*"
+        "https://*.discord.com/*",
+        "https://yerdzxc.github.io/*"
     ],
 
     "update_url": "https://raw.githubusercontent.com/NeverDecaf/discord-PWA/master/updates.xml",
@@ -64,8 +64,8 @@
                 "webpackmodules.js"
             ],
             "matches": [
-                "https://discord.com/*",
-                "https://neverdecaf.github.io/*"
+                "https://*.discord.com/*",
+                "https://yerdzxc.github.io/*"
             ]
         }
     ]
