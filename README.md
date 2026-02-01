@@ -27,3 +27,4 @@ A wrapper for the Discord web client as a Progressive Web Application, for use w
 - To hide the status bar, set the flag `chrome://flags/#enable-desktop-pwas-remove-status-bar` to `Enabled`. (This will probably become the default in the future.)
 - Taskbar behaviour is customizable in the [extension's options](chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html) `chrome-extension://edfpalahildnikdjdnmmoekoncglnblh/options.html`.
 - Code modified from [https://github.com/jamesjohnson280/hello-pwa](https://github.com/jamesjohnson280/hello-pwa), [BetterDiscord](https://github.com/rauenzi/BetterDiscordApp) code was also used/referenced.
+- To build `webpackmodules.js`: clone BetterDiscord > copy build.mjs to BetterDiscord/ > cd BetterDiscord/ > npm install esbuild > node build.mjs

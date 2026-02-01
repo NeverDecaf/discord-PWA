@@ -1,9 +1,14 @@
 var BADGE_COUNT = "mentions";
 var DRAWATTENTION_COUNT = "messages";
-import WebpackModules, {
-    Filters,
-} from "./webpackmodules.js";
-
+var DISPATCHER = null;
+import { getLazy, Filters } from "./webpackmodules.js";
+// Use this import for debug:
+// import("./webpackmodules.js").then((module) => {
+//     const WebpackModules = module.default || module;
+//     const { Filters } = module;
+//     window.WebpackModules = WebpackModules;
+//     window.Filters = Filters;
+// });
 function updateModal(url) {
     setTimeout(() => updateModal(url), 1000);
 }
@@ -56,7 +61,7 @@ window.addEventListener("message", function (ev) {
 // some (Dispatcher) from here: https://github.com/BetterDiscord/BetterDiscord/blob/main/renderer/src/modules/discordmodules.js
 const UsedModules = {
     // Dispatcher: ["dirtyDispatch"],
-    Dispatcher: Filters.byKeys(["dispatch", "subscribe", "register"]),
+    // Dispatcher: Filters.byKeys(["dispatch", "subscribe", "register"]),
     GuildReadStateStore: Filters.byKeys(["hasUnread", "getTotalMentionCount"]), // in BDFDB this is found by: WebpackModules.getModule(m => m && typeof m.getName == "function" && m.getName() == 'GuildReadStateStore' && m)
     // This is how it's found in DBFBD:
     // GuildReadStateStore: (m) =>
@@ -100,7 +105,7 @@ async function retryGetLazyUntilResolved(filter, maxAttempts = 100) {
         const timeoutId = setTimeout(() => controller.abort(), 1000);
 
         try {
-            const result = await WebpackModules.getLazy(filter, {
+            const result = await getLazy(filter, {
                 signal: controller.signal,
             });
             clearTimeout(timeoutId);
@@ -116,18 +121,14 @@ async function retryGetLazyUntilResolved(filter, maxAttempts = 100) {
     }
 }
 // load dispatcher first and wait for CONNECTION_OPEN, but also check for getCurrentUser() in case CONNECTION_OPEN already happened.
-retryGetLazyUntilResolved(UsedModules.Dispatcher)
-    .then(
-        (dispatcher) =>
-            new Promise((done) => {
-                retryGetLazyUntilResolved(UsedModules.UserStore).then(
-                    (userStore) => {
-                        if (userStore.getCurrentUser()) done();
-                    },
-                );
-                dispatcher.subscribe("CONNECTION_OPEN", done);
-            }),
-    )
+retryGetLazyUntilResolved(UsedModules.UserStore)
+    .then((userStore) => {
+        return new Promise((done) => {
+            if (userStore.getCurrentUser()) done();
+            DISPATCHER = userStore._dispatcher;
+            DISPATCHER.subscribe("CONNECTION_OPEN", done);
+        });
+    })
     .then(() => {
         const modulePromises = [];
         for (const [key, value] of Object.entries(UsedModules)) {
@@ -220,17 +221,12 @@ retryGetLazyUntilResolved(UsedModules.Dispatcher)
                 "*",
             );
         }
-        UsedModules.Dispatcher.subscribe("RPC_NOTIFICATION_CREATE", () =>
-            addUnread(),
-        );
-        UsedModules.Dispatcher.subscribe("MESSAGE_ACK", () => addUnread());
-        UsedModules.Dispatcher.subscribe("WINDOW_FOCUS", (e) => {
+        DISPATCHER.subscribe("RPC_NOTIFICATION_CREATE", () => addUnread());
+        DISPATCHER.subscribe("MESSAGE_ACK", () => addUnread());
+        DISPATCHER.subscribe("WINDOW_FOCUS", (e) => {
             if (!e.focused) addUnread();
         });
-        UsedModules.Dispatcher.subscribe(
-            "USER_SETTINGS_PROTO_UPDATE",
-            sendStyle,
-        );
+        DISPATCHER.subscribe("USER_SETTINGS_PROTO_UPDATE", sendStyle);
         sendStyle();
 
         // UsedModules.Dispatcher.subscribe('CHAT_RESIZE',()=>addUnread());
