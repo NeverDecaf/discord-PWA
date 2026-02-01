@@ -124,9 +124,9 @@ async function retryGetLazyUntilResolved(filter, maxAttempts = 100) {
 retryGetLazyUntilResolved(UsedModules.UserStore)
     .then((userStore) => {
         return new Promise((done) => {
-            if (userStore.getCurrentUser()) done();
             DISPATCHER = userStore._dispatcher;
-            DISPATCHER.subscribe("CONNECTION_OPEN", done);
+            if (userStore.getCurrentUser()) done();
+            else DISPATCHER.subscribe("CONNECTION_OPEN", done);
         });
     })
     .then(() => {
